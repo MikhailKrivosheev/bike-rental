@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: bike-rental-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bike
+      POSTGRES_PASSWORD: bike
+      POSTGRES_DB: bike_rental
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bike -d bike_rental']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

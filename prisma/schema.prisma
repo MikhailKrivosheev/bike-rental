@@ -1,0 +1,93 @@
+// Схема БД проекта аренды велосипедов.
+// Документация: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BikeType {
+  CITY
+  MOUNTAIN
+  ROAD
+  ELECTRIC
+  KIDS
+}
+
+enum BikeStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+  RETIRED
+}
+
+enum RentalStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  phone     String?
+  rentals   Rental[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Station {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  latitude  Float
+  longitude Float
+  bikes     Bike[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bike {
+  id            String     @id @default(cuid())
+  model         String
+  type          BikeType   @default(CITY)
+  status        BikeStatus @default(AVAILABLE)
+  /// Цена аренды за час, в копейках.
+  pricePerHour  Int
+  imageUrl      String?
+  description   String?
+  stationId     String?
+  station       Station?   @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  rentals       Rental[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([status])
+  @@index([type])
+}
+
+model Rental {
+  id         String       @id @default(cuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bikeId     String
+  bike       Bike         @relation(fields: [bikeId], references: [id], onDelete: Restrict)
+  status     RentalStatus @default(PENDING)
+  startsAt   DateTime
+  endsAt     DateTime
+  returnedAt DateTime?
+  /// Итоговая стоимость, в копейках.
+  totalPrice Int
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([bikeId])
+  @@index([status])
+}
