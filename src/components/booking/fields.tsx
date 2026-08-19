@@ -5,7 +5,7 @@ import { enUS, pt } from 'date-fns/locale';
 import { useFormatter, useLocale } from 'next-intl';
 import { useMemo } from 'react';
 
-import type { Booking, BookingBike } from '@/components/booking/use-booking';
+import type { Booking, BookingBike } from '@/components/booking/hooks/use-booking';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -22,12 +22,12 @@ import { MAX_DAYS, MAX_HOURS, MIN_HOURS, accessories, pickupTimes } from '@/lib/
 
 const dateFnsLocales = { en: enUS, pt } as const;
 
-type BookingFieldsProps = {
+type FieldsProps = {
   booking: Booking;
   bike: BookingBike;
 };
 
-export function BookingFields({ booking, bike }: BookingFieldsProps) {
+export function Fields({ booking, bike }: FieldsProps) {
   const { translate } = booking;
   const locale = useLocale();
   const format = useFormatter();

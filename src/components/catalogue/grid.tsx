@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
-import { BikeCard, type BikeCardModel } from '@/components/catalogue/bike-card';
+import { Card, type CardModel } from '@/components/catalogue/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -12,14 +12,14 @@ type Filter = {
   label: string;
 };
 
-type BikeGridProps = {
-  bikes: BikeCardModel[];
+type GridProps = {
+  bikes: CardModel[];
   filters: Filter[];
 };
 
 const ALL = 'all';
 
-export function BikeGrid({ bikes, filters }: BikeGridProps) {
+export function Grid({ bikes, filters }: GridProps) {
   const translate = useTranslations('Catalogue');
   const [active, setActive] = useState(ALL);
 
@@ -56,7 +56,7 @@ export function BikeGrid({ bikes, filters }: BikeGridProps) {
       ) : (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(320px,100%),1fr))] gap-5 pt-7 pb-18">
           {visible.map((bike) => (
-            <BikeCard
+            <Card
               key={bike.id}
               bike={bike}
               perHourLabel={translate('perHour')}

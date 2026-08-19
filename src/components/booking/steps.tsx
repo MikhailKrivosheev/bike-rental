@@ -2,7 +2,7 @@
 
 import { useFormatter } from 'next-intl';
 
-import type { Booking, BookingBike } from '@/components/booking/use-booking';
+import type { Booking, BookingBike } from '@/components/booking/hooks/use-booking';
 import { Button } from '@/components/ui/button';
 import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -10,14 +10,14 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { Label } from '@/components/ui/label';
 import { AnimatedPrice } from '@/components/booking/animated-price';
 
-type BookingStepsProps = {
+type StepsProps = {
   booking: Booking;
   bike: BookingBike;
   onCancel: () => void;
 };
 
 /** The email → code → confirmation part of the flow, shared by both entry points. */
-export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
+export function Steps({ booking, bike, onCancel }: StepsProps) {
   const { translate } = booking;
   const format = useFormatter();
 

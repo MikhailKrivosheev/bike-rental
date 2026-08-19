@@ -10,6 +10,6 @@ export default getRequestConfig(async ({ requestLocale }) => {
   return {
     locale,
     // `messages` is the next-intl API field; the JSON files live in /dictionaries.
-    messages: (await import(`../../dictionaries/${locale}.json`)).default,
+    messages: (await import(`Dictionaries/${locale}.json`)).default,
   };
 });

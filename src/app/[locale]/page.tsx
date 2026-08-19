@@ -1,7 +1,7 @@
 import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
 
-import type { BikeCardModel } from '@/components/catalogue/bike-card';
-import { BikeGrid } from '@/components/catalogue/bike-grid';
+import type { CardModel } from '@/components/catalogue/card';
+import { Grid } from '@/components/catalogue/grid';
 import { BikeStatus, BikeType, RentalStatus } from '@/generated/prisma/enums';
 import { formatPrice } from '@/lib/format';
 import { prisma } from '@/lib/prisma';
@@ -41,7 +41,7 @@ export default async function Home() {
     orderBy: [{ status: 'asc' }, { pricePerHour: 'asc' }],
   });
 
-  const cards: BikeCardModel[] = bikes.map((bike) => {
+  const cards: CardModel[] = bikes.map((bike) => {
     const isAvailable = bike.status === BikeStatus.AVAILABLE;
     const freesUpAt = bike.rentals.at(0)?.endsAt;
 
@@ -93,7 +93,7 @@ export default async function Home() {
             <p className="text-sm text-muted-foreground">{translateCatalogue('emptyDescription')}</p>
           </div>
         ) : (
-          <BikeGrid
+          <Grid
             bikes={cards}
             filters={Object.values(BikeType).map((type) => ({
               value: type,

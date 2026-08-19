@@ -2,7 +2,7 @@ import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
-import { BookingPanel } from '@/components/booking/booking-panel';
+import { Panel } from '@/components/booking/panel';
 import { Button } from '@/components/ui/button';
 import { BikeStatus, RentalStatus } from '@/generated/prisma/enums';
 import { Link } from '@/i18n/navigation';
@@ -106,7 +106,7 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
         </div>
 
         {isAvailable ? (
-          <BookingPanel
+          <Panel
             bike={{
               id: bike.id,
               model: bike.model,

@@ -3,18 +3,18 @@
 import { useLocale } from 'next-intl';
 
 import { AnimatedPrice } from '@/components/booking/animated-price';
-import type { Booking, BookingBike } from '@/components/booking/use-booking';
+import type { Booking, BookingBike } from '@/components/booking/hooks/use-booking';
 import { formatPrice } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
-type BookingTotalProps = {
+type TotalProps = {
   booking: Booking;
   bike: BookingBike;
   /** The dialog puts the summary on a muted plate; the sidebar keeps it flat. */
   plate?: boolean;
 };
 
-export function BookingTotal({ booking, bike, plate = false }: BookingTotalProps) {
+export function Total({ booking, bike, plate = false }: TotalProps) {
   const { translate } = booking;
   const locale = useLocale();
 

@@ -59,8 +59,8 @@ src/
   components/ui/       shadcn/ui components
   components/theme-*   theme provider and light/dark toggle
   components/locale-switcher.tsx
-  components/booking/  booking dialog, sticky panel and shared fields
-  components/catalogue/ catalogue grid, filters and cards
+  components/booking/  Dialog, Panel, Fields, Steps, Total + hooks/use-booking
+  components/catalogue/ Card and Grid (filters live in Grid)
   hooks/               shared React hooks
   server/              server actions (booking) and the email stub
   styles/globals.css   Tailwind entry point and theme tokens
@@ -98,6 +98,9 @@ language or theme switcher, no add-ons and no confirmation step: those stay as b
 - Prices are stored in **cents** (`Int`) and rendered with `formatPrice`.
 - Pages that read the database are marked `export const dynamic = 'force-dynamic'`.
 - Add shadcn components with `pnpm dlx shadcn@latest add <name>`.
+- Components are named for what they are inside their folder, without repeating it:
+  `booking/dialog.tsx` exports `Dialog`, not `BookingDialog`. Hooks used by one folder live
+  in that folder's `hooks/`; genuinely shared ones go in `src/hooks/`.
 - The theme comes from shadcn preset `b5F1CoTVeS`; re-apply with `pnpm dlx shadcn@latest apply --preset b5F1CoTVeS`.
 - Not wired up yet: OTP delivery (planned via Resend, codes are logged by
   `src/server/email.ts` in the meantime) and MBWay payment.

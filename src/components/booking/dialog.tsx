@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 
-import { BookingFields } from '@/components/booking/booking-fields';
-import { BookingSteps } from '@/components/booking/booking-steps';
-import { BookingTotal } from '@/components/booking/booking-total';
-import { type BookingBike, useBooking } from '@/components/booking/use-booking';
+import { Fields } from '@/components/booking/fields';
+import { Steps } from '@/components/booking/steps';
+import { Total } from '@/components/booking/total';
+import { type BookingBike, useBooking } from '@/components/booking/hooks/use-booking';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
+  // The shadcn primitive keeps its own name so this file can export `Dialog`.
+  Dialog as DialogRoot,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -17,13 +18,13 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-type BookingDialogProps = {
+type DialogProps = {
   bike: BookingBike;
   className?: string;
 };
 
 /** Booking entry point on a catalogue card: the whole flow lives in the dialog. */
-export function BookingDialog({ bike, className }: BookingDialogProps) {
+export function Dialog({ bike, className }: DialogProps) {
   const booking = useBooking(bike);
   const [open, setOpen] = useState(false);
   const { translate } = booking;
@@ -37,7 +38,7 @@ export function BookingDialog({ bike, className }: BookingDialogProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogRoot open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button size="sm" className={className} onClick={(event) => event.stopPropagation()}>
           {translate('trigger')}
@@ -52,8 +53,8 @@ export function BookingDialog({ bike, className }: BookingDialogProps) {
               <DialogDescription>{translate('subtitle')}</DialogDescription>
             </DialogHeader>
 
-            <BookingFields booking={booking} bike={bike} />
-            <BookingTotal booking={booking} bike={bike} plate />
+            <Fields booking={booking} bike={bike} />
+            <Total booking={booking} bike={bike} plate />
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
@@ -65,9 +66,9 @@ export function BookingDialog({ bike, className }: BookingDialogProps) {
             </DialogFooter>
           </>
         ) : (
-          <BookingSteps booking={booking} bike={bike} onCancel={() => onOpenChange(false)} />
+          <Steps booking={booking} bike={bike} onCancel={() => onOpenChange(false)} />
         )}
       </DialogContent>
-    </Dialog>
+    </DialogRoot>
   );
 }

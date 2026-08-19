@@ -3,21 +3,21 @@
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
 
-import { BookingFields } from '@/components/booking/booking-fields';
-import { BookingSteps } from '@/components/booking/booking-steps';
-import { BookingTotal } from '@/components/booking/booking-total';
-import { type BookingBike, useBooking } from '@/components/booking/use-booking';
+import { Fields } from '@/components/booking/fields';
+import { Steps } from '@/components/booking/steps';
+import { Total } from '@/components/booking/total';
+import { type BookingBike, useBooking } from '@/components/booking/hooks/use-booking';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog as DialogRoot, DialogContent } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { formatPrice } from '@/lib/format';
 
-type BookingPanelProps = {
+type PanelProps = {
   bike: BookingBike;
 };
 
 /** Booking entry point on the bike page: fields sit in the sticky sidebar. */
-export function BookingPanel({ bike }: BookingPanelProps) {
+export function Panel({ bike }: PanelProps) {
   const booking = useBooking(bike);
   const locale = useLocale();
   const [open, setOpen] = useState(false);
@@ -47,11 +47,11 @@ export function BookingPanel({ bike }: BookingPanelProps) {
 
       <Separator />
 
-      <BookingFields booking={booking} bike={bike} />
+      <Fields booking={booking} bike={bike} />
 
       <Separator />
 
-      <BookingTotal booking={booking} bike={bike} />
+      <Total booking={booking} bike={bike} />
 
       <Button
         className="h-[42px] rounded-[9px] text-[15px]"
@@ -66,11 +66,11 @@ export function BookingPanel({ bike }: BookingPanelProps) {
 
       <p className="text-center text-xs text-muted-foreground">{translate('cancellationNote')}</p>
 
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogRoot open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[420px]">
-          <BookingSteps booking={booking} bike={bike} onCancel={() => onOpenChange(false)} />
+          <Steps booking={booking} bike={bike} onCancel={() => onOpenChange(false)} />
         </DialogContent>
-      </Dialog>
+      </DialogRoot>
     </aside>
   );
 }

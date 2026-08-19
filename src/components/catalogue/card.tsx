@@ -2,12 +2,12 @@
 
 import Image from 'next/image';
 
-import { BookingDialog } from '@/components/booking/booking-dialog';
+import { Dialog } from '@/components/booking/dialog';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
-export type BikeCardModel = {
+export type CardModel = {
   id: string;
   model: string;
   type: string;
@@ -24,14 +24,14 @@ export type BikeCardModel = {
   availabilityLabel: string;
 };
 
-type BikeCardProps = {
-  bike: BikeCardModel;
+type CardProps = {
+  bike: CardModel;
   perHourLabel: string;
   perDayLabel: string;
   bookedLabel: string;
 };
 
-export function BikeCard({ bike, perHourLabel, perDayLabel, bookedLabel }: BikeCardProps) {
+export function Card({ bike, perHourLabel, perDayLabel, bookedLabel }: CardProps) {
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-[14px] border bg-card transition-[box-shadow,border-color] duration-150 hover:border-ring/40 hover:shadow-[0_8px_24px_-12px_rgb(0_0_0/0.18)]">
       <div className="relative aspect-4/3 border-b bg-muted">
@@ -98,7 +98,7 @@ export function BikeCard({ bike, perHourLabel, perDayLabel, bookedLabel }: BikeC
           </div>
 
           {bike.isAvailable ? (
-            <BookingDialog
+            <Dialog
               className="relative z-10 h-9 px-4"
               bike={{
                 id: bike.id,

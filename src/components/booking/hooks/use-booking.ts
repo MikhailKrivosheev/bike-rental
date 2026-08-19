@@ -41,7 +41,6 @@ export function useBooking(bike: BookingBike) {
   const [startsAt, setStartsAt] = useState<Date | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // A single picked day is charged by the hour, a range of days by the day.
   const days = range?.from && range.to ? daysBetween(range.from, range.to) : 0;
 
   const quote = useMemo(
@@ -112,7 +111,6 @@ export function useBooking(bike: BookingBike) {
     });
   }
 
-  /** Called when the flow closes, so a completed booking shows up in the catalogue. */
   function finish() {
     if (step === 'done') {
       router.refresh();
