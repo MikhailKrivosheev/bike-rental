@@ -92,6 +92,9 @@ language or theme switcher, no add-ons and no confirmation step: those stay as b
 - Prices are always recomputed on the server from `Bike.pricePerHour` and
   `src/lib/rental.ts`; the amount submitted by the client is ignored.
 - Theme is class-based (`next-themes`, `attribute="class"`), light by default, toggled between light and dark only — the system option is disabled.
+- The neutral ramp in `src/styles/globals.css` is hand-tuned away from the preset's pure
+  white / near-black: the page sits a step below `--card` in both modes, which is what makes
+  surfaces read as raised. Keep that relationship when editing the tokens.
 - Prices are stored in **cents** (`Int`) and rendered with `formatPrice`.
 - Pages that read the database are marked `export const dynamic = 'force-dynamic'`.
 - Add shadcn components with `pnpm dlx shadcn@latest add <name>`.
