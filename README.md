@@ -1,65 +1,69 @@
 # Bike Rental
 
-Сервис аренды велосипедов.
+Bike rental service.
 
-## Стек
+## Stack
 
 - **Next.js 16** (App Router, Turbopack) + **React 19**
 - **TypeScript 5**
-- **Tailwind CSS 4** + **shadcn/ui** (стиль `radix-nova`, тема `mist`, иконки Remix Icon)
-- Бэкенд — Route Handlers / Server Components внутри Next.js (Node.js runtime)
-- **Prisma 7** + **PostgreSQL 18** (драйвер-адаптер `@prisma/adapter-pg`)
-- **pnpm** как пакетный менеджер, Node.js 24 (см. `.nvmrc`)
+- **Tailwind CSS 4** + **shadcn/ui** (`radix-nova` style, `mist` base color, Remix Icon)
+- Backend — Route Handlers / Server Components inside Next.js (Node.js runtime)
+- **Prisma 7** + **PostgreSQL 18** (via the `@prisma/adapter-pg` driver adapter)
+- **pnpm** as the package manager, Node.js 24 (see `.nvmrc`)
 
-## Быстрый старт
+## Getting started
 
 ```bash
-nvm use              # Node 24 из .nvmrc
+nvm use              # Node 24 from .nvmrc
 pnpm install
-cp .env.example .env # при необходимости поправьте DATABASE_URL
+cp .env.example .env # adjust DATABASE_URL if needed
 
-pnpm db:up           # Postgres в docker (host-порт 5433)
-pnpm db:migrate      # применить миграции
-pnpm db:seed         # тестовые данные
+pnpm db:up           # Postgres in docker (host port 5433)
+pnpm db:migrate      # apply migrations
+pnpm db:seed         # sample data
 
 pnpm dev             # http://localhost:3000
 ```
 
-## Скрипты
+## Scripts
 
-| Команда | Что делает |
+| Command | What it does |
 | --- | --- |
-| `pnpm dev` | дев-сервер Next.js |
-| `pnpm build` / `pnpm start` | прод-сборка и запуск |
+| `pnpm dev` | Next.js dev server |
+| `pnpm build` / `pnpm start` | production build and start |
 | `pnpm lint` / `pnpm typecheck` | ESLint / `tsc --noEmit` |
-| `pnpm db:up` / `pnpm db:down` | поднять / остановить Postgres в docker |
+| `pnpm db:up` / `pnpm db:down` | start / stop Postgres in docker |
 | `pnpm db:migrate` | `prisma migrate dev` |
-| `pnpm db:push` | синхронизировать схему без миграции |
-| `pnpm db:generate` | перегенерировать Prisma Client |
+| `pnpm db:push` | sync the schema without a migration |
+| `pnpm db:generate` | regenerate Prisma Client |
 | `pnpm db:studio` | Prisma Studio |
-| `pnpm db:seed` | заполнить БД тестовыми данными |
+| `pnpm db:seed` | load sample data |
 
-## Структура
+## Project layout
 
 ```
 prisma/
-  schema.prisma      модели: User, Station, Bike, Rental
-  migrations/        миграции
-  seed.ts            тестовые данные
+  schema.prisma        models: User, Station, Bike, Rental
+  migrations/          migrations
+  seed.ts              sample data (3 bikes: gravel, MTB, city)
+public/Images/Bikes/   bike photos
 src/
-  app/               роуты App Router
-    api/bikes/       REST-эндпоинт каталога
-    bikes/[id]/      карточка велосипеда
-  components/ui/     компоненты shadcn/ui
-  lib/prisma.ts      singleton Prisma Client
-  lib/format.ts      форматирование цен
-  generated/prisma/  сгенерированный Prisma Client (в git не коммитится)
+  app/                 App Router routes
+    api/bikes/         catalogue REST endpoint
+    bikes/[id]/        bike detail page
+  components/layout/   site header and footer
+  components/ui/       shadcn/ui components
+  lib/prisma.ts        Prisma Client singleton
+  lib/format.ts        price formatting
+  lib/bikes.ts         bike type labels
+  generated/prisma/    generated Prisma Client (not committed)
 ```
 
-## Соглашения
+## Conventions
 
-- Цены хранятся в **копейках** (`Int`), форматируются через `formatPrice`.
-- Страницы, читающие БД, помечены `export const dynamic = 'force-dynamic'`.
-- Компоненты shadcn добавляются через `pnpm dlx shadcn@latest add <name>`.
-- Тема задана пресетом shadcn `b5F1CoTVeS`; переприменить целиком — `pnpm dlx shadcn@latest apply --preset b5F1CoTVeS`.
-- Шрифты: Roboto (`--font-sans`), Noto Serif (`--font-heading`), Geist Mono (`--font-geist-mono`), все с кириллическим сабсетом.
+- The app is English-only: UI copy, seed data and code comments.
+- Prices are stored in **cents** (`Int`) and rendered with `formatPrice`.
+- Pages that read the database are marked `export const dynamic = 'force-dynamic'`.
+- Add shadcn components with `pnpm dlx shadcn@latest add <name>`.
+- The theme comes from shadcn preset `b5F1CoTVeS`; re-apply with `pnpm dlx shadcn@latest apply --preset b5F1CoTVeS`.
+- Fonts: Roboto (`--font-sans`), Noto Serif (`--font-heading`), Geist Mono (`--font-geist-mono`).

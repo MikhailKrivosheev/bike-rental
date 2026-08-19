@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "BikeType" AS ENUM ('CITY', 'MOUNTAIN', 'ROAD', 'ELECTRIC', 'KIDS');
+CREATE TYPE "BikeType" AS ENUM ('GRAVEL', 'MTB', 'CITY');
 
 -- CreateEnum
 CREATE TYPE "BikeStatus" AS ENUM ('AVAILABLE', 'RENTED', 'MAINTENANCE', 'RETIRED');

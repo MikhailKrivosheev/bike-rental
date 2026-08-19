@@ -9,41 +9,58 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 
+const bikes = [
+  {
+    id: 'gravel',
+    model: 'Canyon Grizl 7',
+    type: BikeType.GRAVEL,
+    pricePerHour: 900,
+    imageUrl: '/Images/Bikes/gravel.webp',
+    description:
+      'A fast, forgiving gravel bike for mixed surfaces — wide tyres, relaxed geometry and mounts for everything you need on a long day out.',
+  },
+  {
+    id: 'mtb',
+    model: 'Merida Big Nine 400',
+    type: BikeType.MTB,
+    pricePerHour: 1100,
+    imageUrl: '/Images/Bikes/MTB.webp',
+    description:
+      'A hardtail mountain bike built for trails and singletrack: air fork, hydraulic disc brakes and grippy 29" tyres.',
+  },
+  {
+    id: 'urban',
+    model: "Electra Loft 7D Step-Thru",
+    type: BikeType.CITY,
+    pricePerHour: 600,
+    imageUrl: '/Images/Bikes/urban.webp',
+    description:
+      'A women\'s step-through city bike with an upright riding position, fenders and a rack — perfect for commuting and relaxed rides.',
+  },
+];
+
 async function main() {
   const station = await prisma.station.upsert({
     where: { id: 'station-central' },
     update: {},
     create: {
       id: 'station-central',
-      name: 'Центральная',
-      address: 'ул. Ленина, 1',
+      name: 'Central Station',
+      address: '1 Market Street',
       latitude: 55.7558,
       longitude: 37.6173,
     },
   });
 
-  const bikes = [
-    { model: 'Stels Navigator 500', type: BikeType.CITY, pricePerHour: 15000 },
-    { model: 'Merida Big Nine', type: BikeType.MOUNTAIN, pricePerHour: 30000 },
-    { model: 'Giant Contend', type: BikeType.ROAD, pricePerHour: 35000 },
-    { model: 'Xiaomi Himo C20', type: BikeType.ELECTRIC, pricePerHour: 50000 },
-    { model: 'Forward Cosmo 16', type: BikeType.KIDS, pricePerHour: 10000 },
-  ];
-
   for (const bike of bikes) {
     await prisma.bike.upsert({
-      where: { id: bike.model.toLowerCase().replace(/\s+/g, '-') },
-      update: {},
-      create: {
-        id: bike.model.toLowerCase().replace(/\s+/g, '-'),
-        ...bike,
-        stationId: station.id,
-        description: 'Велосипед в отличном состоянии, регулярное ТО.',
-      },
+      where: { id: bike.id },
+      update: bike,
+      create: { ...bike, stationId: station.id },
     });
   }
 
-  console.log(`Готово: 1 станция, ${bikes.length} велосипедов.`);
+  console.log(`Seeded 1 station and ${bikes.length} bikes.`);
 }
 
 main()

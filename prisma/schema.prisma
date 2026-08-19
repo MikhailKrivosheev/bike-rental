@@ -1,5 +1,5 @@
-// Схема БД проекта аренды велосипедов.
-// Документация: https://pris.ly/d/prisma-schema
+// Database schema for the bike rental app.
+// Docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client"
@@ -11,11 +11,9 @@ datasource db {
 }
 
 enum BikeType {
+  GRAVEL
+  MTB
   CITY
-  MOUNTAIN
-  ROAD
-  ELECTRIC
-  KIDS
 }
 
 enum BikeStatus {
@@ -54,19 +52,19 @@ model Station {
 }
 
 model Bike {
-  id            String     @id @default(cuid())
-  model         String
-  type          BikeType   @default(CITY)
-  status        BikeStatus @default(AVAILABLE)
-  /// Цена аренды за час, в копейках.
-  pricePerHour  Int
-  imageUrl      String?
-  description   String?
-  stationId     String?
-  station       Station?   @relation(fields: [stationId], references: [id], onDelete: SetNull)
-  rentals       Rental[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  id           String     @id @default(cuid())
+  model        String
+  type         BikeType   @default(CITY)
+  status       BikeStatus @default(AVAILABLE)
+  /// Rental price per hour, in cents.
+  pricePerHour Int
+  imageUrl     String?
+  description  String?
+  stationId    String?
+  station      Station?   @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  rentals      Rental[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   @@index([status])
   @@index([type])
@@ -82,7 +80,7 @@ model Rental {
   startsAt   DateTime
   endsAt     DateTime
   returnedAt DateTime?
-  /// Итоговая стоимость, в копейках.
+  /// Total rental price, in cents.
   totalPrice Int
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
