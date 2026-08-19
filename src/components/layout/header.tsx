@@ -6,17 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 
 export async function Header() {
-  const t = await getTranslations('Header');
+  const translate = await getTranslations('Header');
 
   return (
     <header className="border-b">
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-6">
         <Link href="/" className="font-heading text-lg font-semibold tracking-tight">
-          {t('brand')}
+          {translate('brand')}
         </Link>
         <nav className="flex items-center gap-1">
           <Button asChild variant="ghost" size="sm">
-            <Link href="/">{t('bikes')}</Link>
+            <Link href="/">{translate('bikes')}</Link>
           </Button>
           <LocaleSwitcher />
           <ThemeToggle />

@@ -43,7 +43,7 @@ pnpm dev             # http://localhost:3000
 ## Project layout
 
 ```
-messages/              en.json, pt.json — translation catalogues
+dictionaries/          en.json, pt.json — translation catalogues
 prisma/
   schema.prisma        models: User, Station, Bike, Rental
   migrations/          migrations
@@ -55,7 +55,7 @@ src/
   app/
     [locale]/          localised pages (catalogue, bikes/[id])
     api/bikes/         catalogue REST endpoint (not localised)
-  components/layout/   site header and footer
+  components/layout/   header and footer
   components/ui/       shadcn/ui components
   components/theme-*   theme provider and light/dark toggle
   components/locale-switcher.tsx
@@ -68,9 +68,9 @@ src/
 
 ## Conventions
 
-- Code, comments and message keys are English; user-facing copy lives in `messages/*.json`.
+- Code, comments and message keys are English; user-facing copy lives in `dictionaries/*.json`.
 - Locales are prefixed (`/en`, `/pt`); `/` redirects to the negotiated locale. Add a locale in
-  `src/i18n/routing.ts` plus a matching `messages/<locale>.json`.
+  `src/i18n/routing.ts` plus a matching `dictionaries/<locale>.json`.
 - Bike descriptions are translated under `BikeDescriptions.<bike id>` and fall back to
   `Bike.description` from the database.
 - Theme is class-based (`next-themes`, `attribute="class"`), light by default, toggled between light and dark only — the system option is disabled.

@@ -21,11 +21,11 @@ export async function generateMetadata({
   params,
 }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Metadata" });
+  const translate = await getTranslations({ locale, namespace: "Metadata" });
 
   return {
-    title: t("title"),
-    description: t("description"),
+    title: translate("title"),
+    description: translate("description"),
   };
 }
 
