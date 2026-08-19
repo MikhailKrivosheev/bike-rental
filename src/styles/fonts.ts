@@ -1,11 +1,12 @@
-import { Geist_Mono, Noto_Serif, Roboto } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 
-export const fontSans = Roboto({
+export const fontSans = Geist({
   variable: '--font-sans',
   subsets: ['latin'],
 });
 
-export const fontHeading = Noto_Serif({
+/** The design sets headings in Geist too, so it maps to the same family. */
+export const fontHeading = Geist({
   variable: '--font-heading',
   subsets: ['latin'],
 });

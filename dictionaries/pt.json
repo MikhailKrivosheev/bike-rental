@@ -4,22 +4,43 @@
     "description": "Alugue uma bicicleta à hora"
   },
   "Header": {
-    "brand": "Aluguer de Bicicletas",
-    "bikes": "Bicicletas",
+    "brand": "Velo",
+    "brandInitial": "V",
+    "catalogue": "Catálogo",
+    "howItWorks": "Como funciona",
+    "pickupPoints": "Pontos de levantamento",
     "toggleTheme": "Alternar tema",
     "language": "Idioma"
   },
   "Footer": {
-    "copyright": "© {year} Aluguer de Bicicletas",
-    "tagline": "Boa viagem. Capacete incluído."
+    "about": "Bicicletas à hora, por toda a cidade. Aberto todos os dias das 8:00 às 23:00.",
+    "pickupPoints": "Pontos de levantamento",
+    "service": "Serviço",
+    "serviceItems": [
+      "Como funciona",
+      "Preços",
+      "Condições de aluguer"
+    ],
+    "support": "Apoio",
+    "supportItems": [
+      "+351 900 000 000",
+      "help@bikerental.example",
+      "Chat"
+    ],
+    "copyright": "© {year} Velo",
+    "legal": "Termos de serviço · Política de privacidade"
   },
   "Catalogue": {
-    "title": "Alugue uma bicicleta",
-    "subtitle": "Escolha uma bicicleta e levante-a na estação mais próxima.",
+    "title": "Catálogo",
+    "count": "{count, plural, one {# bicicleta} other {# bicicletas}} · pague depois do passeio",
+    "filterAll": "Todas",
     "emptyTitle": "O catálogo está vazio",
     "emptyDescription": "Arranque a base de dados (pnpm db:up), aplique as migrações (pnpm db:migrate) e carregue os dados de exemplo (pnpm db:seed).",
-    "noStation": "Sem estação",
-    "perHour": "/ hora"
+    "noMatches": "Não há bicicletas deste tipo neste momento.",
+    "perHour": "/ hora",
+    "free": "Disponível",
+    "bookedUntil": "Reservada até {time}",
+    "booked": "Reservada"
   },
   "BikeType": {
     "GRAVEL": "Gravel",
@@ -33,11 +54,9 @@
     "RETIRED": "Retirada"
   },
   "BikeDetail": {
-    "back": "Voltar ao catálogo",
+    "back": "← Todas as bicicletas",
+    "specs": "Características",
     "noDescription": "Ainda sem descrição.",
-    "station": "Estação",
-    "address": "Morada",
-    "price": "Preço",
     "perHour": "/ hora",
     "notFound": "Bicicleta não encontrada"
   },
@@ -48,12 +67,10 @@
   },
   "Booking": {
     "trigger": "Reservar",
-    "title": "Reservar {model}",
-    "date": "Data",
+    "title": "{model}",
+    "date": "Data de início",
     "pickDate": "Escolha uma data",
-    "pickupNote": "Levantamento às {hour}:00 em {station}.",
     "duration": "Duração",
-    "durationOption": "{hours, plural, one {# hora} other {# horas}}",
     "accessories": "Extras",
     "accessory": {
       "helmet": "Capacete",
@@ -71,11 +88,8 @@
     "otpDescription": "Enviámos um código de 6 dígitos para {email}.",
     "confirm": "Confirmar reserva",
     "confirming": "A confirmar…",
-    "successTitle": "Reservada!",
-    "successDescription": "A {model} é sua até {until}. Pague com MBWay no levantamento.",
-    "close": "Fechar",
-    "unavailable": "Reservada",
-    "availableFrom": "Disponível novamente {date}",
+    "successTitle": "Reserva confirmada",
+    "successDescription": "Enviámos os detalhes para {email}. Pague com MBWay no levantamento.",
     "errors": {
       "invalidInput": "Verifique os dados da reserva e tente novamente.",
       "pastDate": "Escolha uma data futura.",
@@ -86,6 +100,67 @@
       "tooManyAttempts": "Demasiadas tentativas. Comece a reserva de novo.",
       "wrongCode": "Esse código não está correto.",
       "unexpected": "Algo correu mal. Tente novamente."
+    },
+    "unavailableTrigger": "Reservada",
+    "subtitle": "Escolha a hora e os extras",
+    "time": "Hora de início",
+    "hours": "{hours, plural, one {# hora} other {# horas}}",
+    "decrease": "Menos uma hora",
+    "increase": "Mais uma hora",
+    "pickupPoint": "Ponto de levantamento",
+    "calculation": "{price} × {hours, plural, one {# hora} other {# horas}}",
+    "cancel": "Cancelar",
+    "cancellationNote": "Cancelamento gratuito até 2 horas antes do início",
+    "summaryBike": "Bicicleta",
+    "summaryStart": "Início",
+    "summaryDuration": "Duração",
+    "summaryTotal": "Total",
+    "done": "Concluído",
+    "perHourShort": "/ hora"
+  },
+  "Hero": {
+    "available": "{count, plural, =0 {Nenhuma bicicleta disponível agora} one {# bicicleta disponível agora} other {# bicicletas disponíveis agora}}",
+    "title": "Aluguer de bicicletas à hora",
+    "subtitle": "Escolha uma bicicleta, indique a hora e levante-a no ponto mais próximo. Reservar demora menos de um minuto e paga depois do passeio."
+  },
+  "BikeSpecs": {
+    "gravel": [
+      "Pneus de 45 mm",
+      "2×11 velocidades",
+      "Suportes para bagageiro"
+    ],
+    "mtb": [
+      "Rodas de 29\"",
+      "Forqueta de ar",
+      "Travões hidráulicos"
+    ],
+    "urban": [
+      "Quadro de entrada baixa",
+      "7 velocidades",
+      "Bagageiro e guarda-lamas"
+    ]
+  },
+  "BikeSpecTable": {
+    "gravel": {
+      "Quadro": "Alumínio",
+      "Transmissão": "Shimano GRX 2×11",
+      "Travões": "Disco hidráulico",
+      "Peso": "10,2 kg",
+      "Altura do ciclista": "170–190 cm"
+    },
+    "mtb": {
+      "Quadro": "Alumínio hardtail",
+      "Transmissão": "Shimano Deore 1×12",
+      "Travões": "Disco hidráulico",
+      "Peso": "13,1 kg",
+      "Altura do ciclista": "165–190 cm"
+    },
+    "urban": {
+      "Quadro": "Alumínio de entrada baixa",
+      "Transmissão": "Shimano Nexus 7",
+      "Travões": "Travão V",
+      "Peso": "14,5 kg",
+      "Altura do ciclista": "155–180 cm"
     }
   }
 }

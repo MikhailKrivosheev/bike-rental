@@ -1,13 +1,57 @@
 import { getTranslations } from 'next-intl/server';
 
+import { prisma } from '@/lib/prisma';
+
 export async function Footer() {
-  const translate = await getTranslations('Footer');
+  const [translate, header, stations] = await Promise.all([
+    getTranslations('Footer'),
+    getTranslations('Header'),
+    prisma.station.findMany({ orderBy: { name: 'asc' } }),
+  ]);
+
+  // Placeholder link targets are intentionally omitted: these pages don't exist yet.
+  const columns = [
+    {
+      id: 'pickup-points',
+      title: translate('pickupPoints'),
+      items: stations.map((station) => station.name),
+    },
+    { id: 'how-it-works', title: translate('service'), items: translate.raw('serviceItems') as string[] },
+    { id: 'support', title: translate('support'), items: translate.raw('supportItems') as string[] },
+  ];
 
   return (
-    <footer className="border-t">
-      <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-between gap-2 px-6 py-6 text-sm text-muted-foreground sm:flex-row">
-        <span>{translate('copyright', { year: new Date().getFullYear() })}</span>
-        <span>{translate('tagline')}</span>
+    <footer className="border-t bg-muted/40">
+      <div className="mx-auto grid w-full max-w-[1180px] gap-8 px-6 py-11 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div>
+          <div className="mb-3 flex items-center gap-2.5">
+            <span className="flex size-6 items-center justify-center rounded-[7px] bg-primary text-xs font-semibold text-primary-foreground">
+              {header('brandInitial')}
+            </span>
+            <span className="text-sm font-semibold">{header('brand')}</span>
+          </div>
+          <p className="max-w-[34ch] text-[13px] leading-relaxed text-muted-foreground">
+            {translate('about')}
+          </p>
+        </div>
+
+        {columns.map((column) => (
+          <div key={column.id} id={column.id} className="flex flex-col gap-2.5 scroll-mt-24">
+            <span className="text-[13px] font-semibold">{column.title}</span>
+            {column.items.map((item) => (
+              <span key={item} className="text-[13px] text-muted-foreground">
+                {item}
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div className="border-t">
+        <div className="mx-auto flex w-full max-w-[1180px] flex-col justify-between gap-2 px-6 py-4 text-xs text-muted-foreground sm:flex-row">
+          <span>{translate('copyright', { year: new Date().getFullYear() })}</span>
+          <span>{translate('legal')}</span>
+        </div>
       </div>
     </footer>
   );

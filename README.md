@@ -59,7 +59,8 @@ src/
   components/ui/       shadcn/ui components
   components/theme-*   theme provider and light/dark toggle
   components/locale-switcher.tsx
-  components/booking/  booking dialog and animated price
+  components/booking/  booking dialog, sticky panel and shared fields
+  components/catalogue/ catalogue grid, filters and cards
   hooks/               shared React hooks
   server/              server actions (booking) and the email stub
   styles/globals.css   Tailwind entry point and theme tokens
@@ -68,6 +69,13 @@ src/
   lib/format.ts        locale-aware price formatting
   generated/prisma/    generated Prisma Client (not committed)
 ```
+
+## Design
+
+`public/design/` holds the handoff: `README.md`, the `bike-rental.dc.html` prototype and
+screenshots. The layout, spacing, typography and states follow it; **colors do not** — those
+come from the shadcn preset already in `src/styles/globals.css`. The prototype has no
+language or theme switcher, no add-ons and no confirmation step: those stay as built.
 
 ## Conventions
 
@@ -88,4 +96,4 @@ src/
 - The theme comes from shadcn preset `b5F1CoTVeS`; re-apply with `pnpm dlx shadcn@latest apply --preset b5F1CoTVeS`.
 - Not wired up yet: OTP delivery (planned via Resend, codes are logged by
   `src/server/email.ts` in the meantime) and MBWay payment.
-- Fonts: Roboto (`--font-sans`), Noto Serif (`--font-heading`), Geist Mono (`--font-geist-mono`).
+- Fonts: Geist (`--font-sans`, `--font-heading`) and Geist Mono (`--font-geist-mono`), per the design handoff.

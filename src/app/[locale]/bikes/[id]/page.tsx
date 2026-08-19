@@ -2,11 +2,8 @@ import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
-import { BookingDialog } from '@/components/booking/booking-dialog';
-import { Badge } from '@/components/ui/badge';
+import { BookingPanel } from '@/components/booking/booking-panel';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { BikeStatus, RentalStatus } from '@/generated/prisma/enums';
 import { Link } from '@/i18n/navigation';
 import { formatPrice } from '@/lib/format';
@@ -17,14 +14,13 @@ export const dynamic = 'force-dynamic';
 export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[id]'>) {
   const { id } = await params;
 
-  const [locale, format, t, tType, tStatus, tDescription, tBooking] = await Promise.all([
+  const [locale, format, t, tCatalogue, tSpecs, tDescription] = await Promise.all([
     getLocale(),
     getFormatter(),
     getTranslations('BikeDetail'),
-    getTranslations('BikeType'),
-    getTranslations('BikeStatus'),
+    getTranslations('Catalogue'),
+    getTranslations('BikeSpecTable'),
     getTranslations('BikeDescriptions'),
-    getTranslations('Booking'),
   ]);
 
   const bike = await prisma.bike.findUnique({
@@ -43,80 +39,92 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
     notFound();
   }
 
-  // Descriptions live in the message catalogue so they can be translated;
-  // anything not translated yet falls back to the value stored in the database.
+  const isAvailable = bike.status === BikeStatus.AVAILABLE;
   const freesUpAt = bike.rentals.at(0)?.endsAt;
 
+  // Descriptions and spec sheets live in the message catalogue so they can be
+  // translated; anything missing falls back to the database value.
   const description = tDescription.has(bike.id)
     ? tDescription(bike.id)
     : (bike.description ?? t('noDescription'));
 
+  const specs = tSpecs.has(bike.id)
+    ? Object.entries(tSpecs.raw(bike.id) as Record<string, string>)
+    : [];
+
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-14">
-      <Button asChild variant="ghost" size="sm" className="mb-6 -ml-3">
-        <Link href="/">&larr; {t('back')}</Link>
+    <main className="mx-auto w-full max-w-[1180px] flex-1 px-6 pt-8 pb-20">
+      <Button asChild variant="outline" size="sm" className="mb-6 h-8 text-[13px]">
+        <Link href="/">{t('back')}</Link>
       </Button>
 
-      <Card className="overflow-hidden pt-0">
-        {bike.imageUrl ? (
-          <div className="relative aspect-16/9 w-full bg-muted">
-            <Image
-              src={bike.imageUrl}
-              alt={bike.model}
-              fill
-              sizes="(min-width: 768px) 672px, 100vw"
-              className="object-cover"
-              priority
-            />
+      <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,1fr)]">
+        <div className="flex flex-col gap-4">
+          <div className="relative aspect-16/10 overflow-hidden rounded-[14px] border bg-muted">
+            {bike.imageUrl ? (
+              <Image
+                src={bike.imageUrl}
+                alt={bike.model}
+                fill
+                sizes="(min-width: 1180px) 720px, 100vw"
+                className="object-cover"
+                priority
+              />
+            ) : null}
           </div>
-        ) : null}
-        <CardHeader>
-          <CardTitle className="font-heading text-2xl">{bike.model}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">{tType(bike.type)}</Badge>
-            <Badge>{tStatus(bike.status)}</Badge>
+
+          <div className="pt-3">
+            <h1 className="mb-2.5 text-[32px] font-semibold tracking-[-0.025em]">{bike.model}</h1>
+            <p className="mb-6 max-w-[60ch] text-base leading-[1.65] text-pretty text-muted-foreground">
+              {description}
+            </p>
+
+            {specs.length > 0 ? (
+              <>
+                <h2 className="mb-3 text-[15px] font-semibold">{t('specs')}</h2>
+                <dl className="overflow-hidden rounded-xl border">
+                  {specs.map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="flex justify-between gap-6 border-b px-4 py-3 text-sm last:border-b-0"
+                    >
+                      <dt className="text-muted-foreground">{label}</dt>
+                      <dd className="font-medium">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </>
+            ) : null}
           </div>
-          <Separator />
-          <dl className="grid gap-2 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">{t('station')}</dt>
-              <dd>{bike.station?.name ?? '—'}</dd>
+        </div>
+
+        {isAvailable ? (
+          <BookingPanel
+            bike={{
+              id: bike.id,
+              model: bike.model,
+              pricePerHour: bike.pricePerHour,
+              stationName: bike.station?.name ?? '—',
+            }}
+          />
+        ) : (
+          <aside className="flex flex-col gap-4 rounded-2xl border p-[22px] lg:sticky lg:top-24">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[28px] font-semibold tracking-[-0.02em]">
+                {formatPrice(bike.pricePerHour, locale)}
+              </span>
+              <span className="text-sm text-muted-foreground">{t('perHour')}</span>
             </div>
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">{t('address')}</dt>
-              <dd>{bike.station?.address ?? '—'}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">{t('price')}</dt>
-              <dd className="font-medium">
-                {formatPrice(bike.pricePerHour, locale)} {t('perHour')}
-              </dd>
-            </div>
-          </dl>
-          {bike.status === BikeStatus.AVAILABLE ? (
-            <BookingDialog
-              className="w-full"
-              bike={{
-                id: bike.id,
-                model: bike.model,
-                pricePerHour: bike.pricePerHour,
-                stationName: bike.station?.name ?? '—',
-              }}
-            />
-          ) : (
             <p className="text-sm text-muted-foreground">
               {freesUpAt
-                ? tBooking('availableFrom', {
-                    date: format.dateTime(freesUpAt, { dateStyle: 'medium', timeStyle: 'short' }),
+                ? tCatalogue('bookedUntil', {
+                    time: format.dateTime(freesUpAt, { dateStyle: 'medium', timeStyle: 'short' }),
                   })
-                : tBooking('unavailable')}
+                : tCatalogue('booked')}
             </p>
-          )}
-        </CardContent>
-      </Card>
+          </aside>
+        )}
+      </div>
     </main>
   );
 }

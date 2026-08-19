@@ -5,21 +5,42 @@
   },
   "Header": {
     "brand": "Bike Rental",
-    "bikes": "Bikes",
+    "brandInitial": "B",
+    "catalogue": "Catalogue",
+    "howItWorks": "How it works",
+    "pickupPoints": "Pickup points",
     "toggleTheme": "Toggle theme",
     "language": "Language"
   },
   "Footer": {
+    "about": "Bikes by the hour, all over the city. Open every day from 8:00 to 23:00.",
+    "pickupPoints": "Pickup points",
+    "service": "Service",
+    "serviceItems": [
+      "How it works",
+      "Pricing",
+      "Rental terms"
+    ],
+    "support": "Support",
+    "supportItems": [
+      "+351 900 000 000",
+      "help@bikerental.example",
+      "Live chat"
+    ],
     "copyright": "© {year} Bike Rental",
-    "tagline": "Ride safe. Helmets included."
+    "legal": "Terms of service · Privacy policy"
   },
   "Catalogue": {
-    "title": "Rent a bike",
-    "subtitle": "Pick a bike and collect it at the nearest station.",
+    "title": "Catalogue",
+    "count": "{count, plural, one {# bike} other {# bikes}} · pay after the ride",
+    "filterAll": "All",
     "emptyTitle": "The catalogue is empty",
     "emptyDescription": "Start the database (pnpm db:up), apply migrations (pnpm db:migrate) and load sample data (pnpm db:seed).",
-    "noStation": "No station",
-    "perHour": "/ hour"
+    "noMatches": "No bikes of this type right now.",
+    "perHour": "/ hour",
+    "free": "Available",
+    "bookedUntil": "Booked until {time}",
+    "booked": "Booked"
   },
   "BikeType": {
     "GRAVEL": "Gravel",
@@ -33,11 +54,9 @@
     "RETIRED": "Retired"
   },
   "BikeDetail": {
-    "back": "Back to catalogue",
+    "back": "← All bikes",
+    "specs": "Specifications",
     "noDescription": "No description yet.",
-    "station": "Station",
-    "address": "Address",
-    "price": "Price",
     "perHour": "/ hour",
     "notFound": "Bike not found"
   },
@@ -48,12 +67,10 @@
   },
   "Booking": {
     "trigger": "Book",
-    "title": "Book {model}",
-    "date": "Date",
+    "title": "{model}",
+    "date": "Start date",
     "pickDate": "Pick a date",
-    "pickupNote": "Pickup at {hour}:00 at {station}.",
     "duration": "Duration",
-    "durationOption": "{hours, plural, one {# hour} other {# hours}}",
     "accessories": "Add-ons",
     "accessory": {
       "helmet": "Helmet",
@@ -71,11 +88,8 @@
     "otpDescription": "We sent a 6-digit code to {email}.",
     "confirm": "Confirm booking",
     "confirming": "Confirming…",
-    "successTitle": "Booked!",
-    "successDescription": "{model} is yours until {until}. Pay with MBWay when you pick it up.",
-    "close": "Close",
-    "unavailable": "Booked",
-    "availableFrom": "Available again {date}",
+    "successTitle": "Booking confirmed",
+    "successDescription": "We've emailed the details to {email}. Pay with MBWay when you pick the bike up.",
     "errors": {
       "invalidInput": "Please check the booking details and try again.",
       "pastDate": "Pick a date in the future.",
@@ -86,6 +100,67 @@
       "tooManyAttempts": "Too many attempts. Start the booking again.",
       "wrongCode": "That code is not right.",
       "unexpected": "Something went wrong. Please try again."
+    },
+    "unavailableTrigger": "Booked",
+    "subtitle": "Choose your time and add-ons",
+    "time": "Start time",
+    "hours": "{hours, plural, one {# hour} other {# hours}}",
+    "decrease": "One hour less",
+    "increase": "One hour more",
+    "pickupPoint": "Pickup point",
+    "calculation": "{price} × {hours, plural, one {# hour} other {# hours}}",
+    "cancel": "Cancel",
+    "cancellationNote": "Free cancellation up to 2 hours before the start",
+    "summaryBike": "Bike",
+    "summaryStart": "Start",
+    "summaryDuration": "Duration",
+    "summaryTotal": "Total",
+    "done": "Done",
+    "perHourShort": "/ hour"
+  },
+  "Hero": {
+    "available": "{count, plural, =0 {No bikes available right now} one {# bike available right now} other {# bikes available right now}}",
+    "title": "Bike rental by the hour",
+    "subtitle": "Pick a bike, choose your time and collect it at the nearest point. Booking takes less than a minute, you pay after the ride."
+  },
+  "BikeSpecs": {
+    "gravel": [
+      "45 mm tyres",
+      "2×11 speeds",
+      "Rack mounts"
+    ],
+    "mtb": [
+      "29\" wheels",
+      "Air fork",
+      "Hydraulic brakes"
+    ],
+    "urban": [
+      "Step-through frame",
+      "7 speeds",
+      "Rack & fenders"
+    ]
+  },
+  "BikeSpecTable": {
+    "gravel": {
+      "Frame": "Aluminium",
+      "Groupset": "Shimano GRX 2×11",
+      "Brakes": "Hydraulic disc",
+      "Weight": "10.2 kg",
+      "Rider height": "170–190 cm"
+    },
+    "mtb": {
+      "Frame": "Aluminium hardtail",
+      "Groupset": "Shimano Deore 1×12",
+      "Brakes": "Hydraulic disc",
+      "Weight": "13.1 kg",
+      "Rider height": "165–190 cm"
+    },
+    "urban": {
+      "Frame": "Aluminium step-through",
+      "Groupset": "Shimano Nexus 7",
+      "Brakes": "V-brake",
+      "Weight": "14.5 kg",
+      "Rider height": "155–180 cm"
     }
   }
 }

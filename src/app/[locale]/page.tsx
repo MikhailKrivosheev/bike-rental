@@ -1,31 +1,23 @@
 import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
-import Image from 'next/image';
 
-import { BookingDialog } from '@/components/booking/booking-dialog';
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { BikeStatus, RentalStatus } from '@/generated/prisma/enums';
-import { Link } from '@/i18n/navigation';
+import type { BikeCardModel } from '@/components/catalogue/bike-card';
+import { BikeGrid } from '@/components/catalogue/bike-grid';
+import { BikeStatus, BikeType, RentalStatus } from '@/generated/prisma/enums';
 import { formatPrice } from '@/lib/format';
 import { prisma } from '@/lib/prisma';
-import { cn } from '@/lib/utils';
 
 // The catalogue reads the database, so render it per request instead of at build time.
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const [locale, format, t, tType, tBooking] = await Promise.all([
+  const [locale, format, t, tHero, tType, tSpecs, tDescription] = await Promise.all([
     getLocale(),
     getFormatter(),
     getTranslations('Catalogue'),
+    getTranslations('Hero'),
     getTranslations('BikeType'),
-    getTranslations('Booking'),
+    getTranslations('BikeSpecs'),
+    getTranslations('BikeDescriptions'),
   ]);
 
   const bikes = await prisma.bike.findMany({
@@ -42,106 +34,63 @@ export default async function Home() {
     orderBy: [{ status: 'asc' }, { pricePerHour: 'asc' }],
   });
 
+  const cards: BikeCardModel[] = bikes.map((bike) => {
+    const isAvailable = bike.status === BikeStatus.AVAILABLE;
+    const freesUpAt = bike.rentals.at(0)?.endsAt;
+
+    return {
+      id: bike.id,
+      model: bike.model,
+      type: bike.type,
+      typeLabel: tType(bike.type),
+      description: tDescription.has(bike.id) ? tDescription(bike.id) : (bike.description ?? ''),
+      specs: tSpecs.has(bike.id) ? (tSpecs.raw(bike.id) as string[]) : [],
+      price: bike.pricePerHour,
+      priceLabel: formatPrice(bike.pricePerHour, locale),
+      imageUrl: bike.imageUrl,
+      stationName: bike.station?.name ?? '—',
+      isAvailable,
+      availabilityLabel: isAvailable
+        ? t('free')
+        : freesUpAt
+          ? t('bookedUntil', { time: format.dateTime(freesUpAt, { timeStyle: 'short' }) })
+          : t('booked'),
+    };
+  });
+
+  const availableCount = cards.filter((bike) => bike.isAvailable).length;
+
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14">
-      <header className="mb-10 flex flex-col gap-2">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">{t('title')}</h1>
-        <p className="text-muted-foreground">{t('subtitle')}</p>
-      </header>
+    <main className="flex-1">
+      <section className="mx-auto w-full max-w-[1180px] px-6 pt-16 pb-10">
+        <div className="mb-5 inline-flex h-[26px] items-center gap-2 rounded-full border bg-muted/40 px-2.5 text-xs text-muted-foreground">
+          <span className="size-1.5 rounded-full bg-emerald-500" />
+          {tHero('available', { count: availableCount })}
+        </div>
+        <h1 className="mb-3.5 max-w-[16ch] text-[44px] leading-[1.1] font-semibold tracking-[-0.03em] text-balance">
+          {tHero('title')}
+        </h1>
+        <p className="max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground">
+          {tHero('subtitle')}
+        </p>
+      </section>
 
-      {bikes.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('emptyTitle')}</CardTitle>
-            <CardDescription>{t('emptyDescription')}</CardDescription>
-          </CardHeader>
-        </Card>
-      ) : (
-        <ul id="bikes" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {bikes.map((bike) => {
-            const isAvailable = bike.status === BikeStatus.AVAILABLE;
-            const freesUpAt = bike.rentals.at(0)?.endsAt;
-
-            return (
-              <li key={bike.id}>
-                <Card
-                  className={cn(
-                    'group relative h-full gap-4 overflow-hidden pt-0 transition-shadow',
-                    isAvailable ? 'hover:shadow-md' : 'bg-muted/40',
-                  )}
-                >
-                  <div className="relative aspect-4/3 w-full overflow-hidden bg-muted">
-                    {bike.imageUrl ? (
-                      <Image
-                        src={bike.imageUrl}
-                        alt={bike.model}
-                        fill
-                        sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 100vw"
-                        className={cn(
-                          'object-cover transition-transform duration-300',
-                          isAvailable ? 'group-hover:scale-105' : 'opacity-50 grayscale',
-                        )}
-                      />
-                    ) : null}
-                    <Badge className="absolute top-3 left-3" variant="secondary">
-                      {tType(bike.type)}
-                    </Badge>
-                    {isAvailable ? null : (
-                      <Badge className="absolute top-3 right-3" variant="destructive">
-                        {tBooking('unavailable')}
-                      </Badge>
-                    )}
-                  </div>
-
-                  <CardHeader>
-                    <CardTitle>
-                      {/* Stretched link: the whole card opens the bike page, while the
-                          booking button on top stays clickable. */}
-                      <Link
-                        href={`/bikes/${bike.id}`}
-                        className="after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:ring-[3px] focus-visible:after:ring-ring/50"
-                      >
-                        {bike.model}
-                      </Link>
-                    </CardTitle>
-                    <CardDescription>
-                      {isAvailable
-                        ? (bike.station?.name ?? t('noStation'))
-                        : freesUpAt
-                          ? tBooking('availableFrom', {
-                              date: format.dateTime(freesUpAt, {
-                                dateStyle: 'medium',
-                                timeStyle: 'short',
-                              }),
-                            })
-                          : tBooking('unavailable')}
-                    </CardDescription>
-                  </CardHeader>
-
-                  <CardContent className="flex items-center justify-between gap-3">
-                    <span className={cn('text-lg font-medium', !isAvailable && 'text-muted-foreground')}>
-                      {formatPrice(bike.pricePerHour, locale)}
-                      <span className="text-sm text-muted-foreground"> {t('perHour')}</span>
-                    </span>
-
-                    {isAvailable ? (
-                      <BookingDialog
-                        className="relative z-10"
-                        bike={{
-                          id: bike.id,
-                          model: bike.model,
-                          pricePerHour: bike.pricePerHour,
-                          stationName: bike.station?.name ?? t('noStation'),
-                        }}
-                      />
-                    ) : null}
-                  </CardContent>
-                </Card>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <section id="catalogue" className="mx-auto w-full max-w-[1180px] scroll-mt-20 px-6 pb-6">
+        {cards.length === 0 ? (
+          <div className="rounded-[14px] border p-6">
+            <h2 className="mb-1.5 text-xl font-semibold">{t('emptyTitle')}</h2>
+            <p className="text-sm text-muted-foreground">{t('emptyDescription')}</p>
+          </div>
+        ) : (
+          <BikeGrid
+            bikes={cards}
+            filters={Object.values(BikeType).map((type) => ({
+              value: type,
+              label: tType(type),
+            }))}
+          />
+        )}
+      </section>
     </main>
   );
 }

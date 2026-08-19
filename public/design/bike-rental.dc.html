@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="page">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Geist, ui-sans-serif, system-ui, sans-serif; background: #ffffff; color: #09090b; -webkit-font-smoothing: antialiased; }
+  a { color: #09090b; text-decoration: none; }
+  a:hover { color: #52525b; }
+  @keyframes dcFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes dcPop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+
+<div style="min-height:100vh; display:flex; flex-direction:column; background:#ffffff;">
+
+  <header style="position:sticky; top:0; z-index:30; background:rgba(255,255,255,.85); backdrop-filter:blur(8px); border-bottom:1px solid #e4e4e7;">
+    <div style="max-width:1180px; margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; gap:32px;">
+      <div onClick="{{ goHome }}" style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+        <div style="width:28px; height:28px; border-radius:8px; background:#18181b; display:flex; align-items:center; justify-content:center; color:#fafafa; font-size:14px; font-weight:600;">В</div>
+        <span style="font-size:15px; font-weight:600; letter-spacing:-.01em;">Велопрокат</span>
+      </div>
+      <nav style="display:flex; gap:24px; font-size:14px; color:#71717a;">
+        <a href="#catalog" style="color:#71717a;" style-hover="color:#09090b;">Каталог</a>
+        <a href="#how" style="color:#71717a;" style-hover="color:#09090b;">Как это работает</a>
+        <a href="#points" style="color:#71717a;" style-hover="color:#09090b;">Точки выдачи</a>
+      </nav>
+      <div style="flex:1;"></div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button style="height:36px; padding:0 14px; border-radius:8px; border:1px solid #e4e4e7; background:#ffffff; color:#09090b; font-family:inherit; font-size:14px; font-weight:500; cursor:pointer;" style-hover="background:#f4f4f5;">Мои брони</button>
+        <button style="height:36px; padding:0 14px; border-radius:8px; border:1px solid transparent; background:#18181b; color:#fafafa; font-family:inherit; font-size:14px; font-weight:500; cursor:pointer;" style-hover="background:#27272a;">Войти</button>
+      </div>
+    </div>
+  </header>
+
+  <main style="flex:1;">
+
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <section style="max-width:1180px; margin:0 auto; padding:64px 24px 40px;">
+          <div style="display:inline-flex; align-items:center; gap:8px; height:26px; padding:0 10px; border-radius:999px; border:1px solid #e4e4e7; background:#fafafa; font-size:12px; color:#71717a; margin-bottom:20px;">
+            <span style="width:6px; height:6px; border-radius:999px; background:#22c55e;"></span>
+            18 велосипедов свободны сейчас
+          </div>
+          <h1 style="margin:0 0 14px; font-size:44px; line-height:1.1; letter-spacing:-.03em; font-weight:600; max-width:16ch; text-wrap:balance;">Аренда велосипедов по часам</h1>
+          <p style="margin:0; font-size:16px; line-height:1.6; color:#71717a; max-width:56ch; text-wrap:pretty;">Выберите велосипед, укажите время — заберите на ближайшей точке. Бронирование занимает меньше минуты, оплата после поездки.</p>
+        </section>
+
+        <section id="catalog" style="max-width:1180px; margin:0 auto; padding:0 24px 24px;">
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; padding-bottom:20px; border-bottom:1px solid #e4e4e7;">
+            <div>
+              <h2 style="margin:0 0 6px; font-size:20px; font-weight:600; letter-spacing:-.01em;">Каталог</h2>
+              <p style="margin:0; font-size:14px; color:#71717a;">{{ countLabel }}</p>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+                <button onClick="{{ f.onClick }}" style="height:34px; padding:0 14px; border-radius:8px; border:1px solid {{ f.border }}; background:{{ f.bg }}; color:{{ f.fg }}; font-family:inherit; font-size:13px; font-weight:500; cursor:pointer;">{{ f.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:20px; padding:28px 0 72px;">
+            <sc-for list="{{ visibleBikes }}" as="b" hint-placeholder-count="6">
+              <article onClick="{{ b.onOpen }}" style="display:flex; flex-direction:column; border:1px solid #e4e4e7; border-radius:14px; background:#ffffff; overflow:hidden; cursor:pointer; transition:box-shadow .15s ease, border-color .15s ease;" style-hover="box-shadow:0 8px 24px -12px rgba(9,9,11,.18); border-color:#d4d4d8;">
+                <div style="position:relative; aspect-ratio:4/3; background:repeating-linear-gradient(135deg, #f4f4f5 0 10px, #ededf0 10px 20px); display:flex; align-items:center; justify-content:center; border-bottom:1px solid #e4e4e7;">
+                  <span style="font-family:'Geist Mono', ui-monospace, monospace; font-size:11px; letter-spacing:.04em; color:#a1a1aa; text-transform:uppercase;">фото · {{ b.slug }}</span>
+                  <span style="position:absolute; top:12px; left:12px; height:24px; padding:0 10px; border-radius:999px; background:#ffffff; border:1px solid #e4e4e7; font-size:12px; font-weight:500; display:inline-flex; align-items:center;">{{ b.type }}</span>
+                  <span style="position:absolute; top:12px; right:12px; height:24px; padding:0 10px; border-radius:999px; background:{{ b.availBg }}; color:{{ b.availFg }}; font-size:12px; font-weight:500; display:inline-flex; align-items:center;">{{ b.availLabel }}</span>
+                </div>
+                <div style="padding:18px; display:flex; flex-direction:column; gap:10px; flex:1;">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px;">
+                    <h3 style="margin:0; font-size:16px; font-weight:600; letter-spacing:-.01em;">{{ b.name }}</h3>
+                    <sc-if value="{{ showRatings }}" hint-placeholder-val="{{ true }}">
+                      <span style="font-size:13px; color:#71717a; white-space:nowrap;">★ {{ b.rating }}</span>
+                    </sc-if>
+                  </div>
+                  <p style="margin:0; font-size:14px; line-height:1.55; color:#71717a; text-wrap:pretty;">{{ b.description }}</p>
+                  <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
+                    <sc-for list="{{ b.specs }}" as="s" hint-placeholder-count="3">
+                      <span style="height:22px; padding:0 8px; border-radius:6px; background:#f4f4f5; color:#52525b; font-size:12px; display:inline-flex; align-items:center;">{{ s }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="flex:1;"></div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:14px; margin-top:4px; border-top:1px solid #f4f4f5;">
+                    <div style="display:flex; align-items:baseline; gap:4px;">
+                      <span style="font-size:20px; font-weight:600; letter-spacing:-.02em;">{{ b.price }} ₽</span>
+                      <span style="font-size:13px; color:#71717a;">/ час</span>
+                    </div>
+                    <button onClick="{{ b.onBook }}" disabled="{{ b.disabled }}" style="height:36px; padding:0 16px; border-radius:8px; border:1px solid transparent; background:{{ b.btnBg }}; color:{{ b.btnFg }}; font-family:inherit; font-size:14px; font-weight:500; cursor:{{ b.btnCursor }};">{{ b.btnLabel }}</button>
+                  </div>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isBike }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1180px; margin:0 auto; padding:32px 24px 80px;">
+        <button onClick="{{ goHome }}" style="height:32px; padding:0 12px; margin-bottom:24px; border-radius:8px; border:1px solid #e4e4e7; background:#ffffff; color:#52525b; font-family:inherit; font-size:13px; cursor:pointer;" style-hover="background:#f4f4f5;">← Все велосипеды</button>
+        <div style="display:grid; grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr); gap:40px; align-items:start;">
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div style="aspect-ratio:16/10; border:1px solid #e4e4e7; border-radius:14px; background:repeating-linear-gradient(135deg, #f4f4f5 0 12px, #ededf0 12px 24px); display:flex; align-items:center; justify-content:center;">
+              <span style="font-family:'Geist Mono', ui-monospace, monospace; font-size:12px; letter-spacing:.04em; color:#a1a1aa; text-transform:uppercase;">фото · {{ sel.slug }}</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
+              <sc-for list="{{ sel.gallery }}" as="g" hint-placeholder-count="3">
+                <div style="aspect-ratio:4/3; border:1px solid #e4e4e7; border-radius:10px; background:repeating-linear-gradient(135deg, #fafafa 0 8px, #f2f2f4 8px 16px); display:flex; align-items:center; justify-content:center;">
+                  <span style="font-family:'Geist Mono', ui-monospace, monospace; font-size:10px; color:#a1a1aa; text-transform:uppercase;">{{ g }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding-top:12px;">
+              <h1 style="margin:0 0 10px; font-size:32px; font-weight:600; letter-spacing:-.025em;">{{ sel.name }}</h1>
+              <p style="margin:0 0 24px; font-size:16px; line-height:1.65; color:#52525b; max-width:60ch; text-wrap:pretty;">{{ sel.longDescription }}</p>
+              <h2 style="margin:0 0 12px; font-size:15px; font-weight:600;">Характеристики</h2>
+              <div style="border:1px solid #e4e4e7; border-radius:12px; overflow:hidden;">
+                <sc-for list="{{ sel.rows }}" as="r" hint-placeholder-count="5">
+                  <div style="display:flex; justify-content:space-between; gap:24px; padding:12px 16px; font-size:14px; border-bottom:1px solid #f4f4f5;">
+                    <span style="color:#71717a;">{{ r.k }}</span>
+                    <span style="font-weight:500;">{{ r.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <aside style="position:sticky; top:96px; border:1px solid #e4e4e7; border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:16px; background:#ffffff;">
+            <div style="display:flex; align-items:baseline; gap:6px;">
+              <span style="font-size:28px; font-weight:600; letter-spacing:-.02em;">{{ sel.price }} ₽</span>
+              <span style="font-size:14px; color:#71717a;">/ час</span>
+            </div>
+            <div style="height:1px; background:#e4e4e7;"></div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="font-size:13px; font-weight:500;">Дата и время начала</label>
+              <input type="datetime-local" value="{{ start }}" onChange="{{ onStart }}" style="height:38px; padding:0 12px; border-radius:8px; border:1px solid #e4e4e7; font-family:inherit; font-size:14px; color:#09090b; background:#ffffff;">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="font-size:13px; font-weight:500;">Длительность</label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button onClick="{{ dec }}" style="width:38px; height:38px; border-radius:8px; border:1px solid #e4e4e7; background:#ffffff; font-family:inherit; font-size:16px; cursor:pointer;" style-hover="background:#f4f4f5;">−</button>
+                <div style="flex:1; height:38px; border:1px solid #e4e4e7; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:500;">{{ hoursLabel }}</div>
+                <button onClick="{{ inc }}" style="width:38px; height:38px; border-radius:8px; border:1px solid #e4e4e7; background:#ffffff; font-family:inherit; font-size:16px; cursor:pointer;" style-hover="background:#f4f4f5;">+</button>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="font-size:13px; font-weight:500;">Точка выдачи</label>
+              <select value="{{ point }}" onChange="{{ onPoint }}" style="height:38px; padding:0 10px; border-radius:8px; border:1px solid #e4e4e7; font-family:inherit; font-size:14px; background:#ffffff; color:#09090b;">
+                <sc-for list="{{ points }}" as="p" hint-placeholder-count="3">
+                  <option value="{{ p }}">{{ p }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="height:1px; background:#e4e4e7;"></div>
+            <div style="display:flex; justify-content:space-between; font-size:14px; color:#71717a;">
+              <span>{{ calcLabel }}</span>
+              <span style="color:#09090b; font-weight:600; font-size:16px;">{{ total }} ₽</span>
+            </div>
+            <button onClick="{{ confirm }}" style="height:42px; border-radius:9px; border:1px solid transparent; background:#18181b; color:#fafafa; font-family:inherit; font-size:15px; font-weight:500; cursor:pointer;" style-hover="background:#27272a;">Забронировать</button>
+            <p style="margin:0; font-size:12px; color:#a1a1aa; text-align:center;">Бесплатная отмена за 2 часа до начала</p>
+          </aside>
+        </div>
+      </div>
+    </sc-if>
+
+  </main>
+
+  <footer style="border-top:1px solid #e4e4e7; background:#fafafa;">
+    <div style="max-width:1180px; margin:0 auto; padding:44px 24px; display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:32px;">
+      <div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <div style="width:24px; height:24px; border-radius:7px; background:#18181b; display:flex; align-items:center; justify-content:center; color:#fafafa; font-size:12px; font-weight:600;">В</div>
+          <span style="font-size:14px; font-weight:600;">Велопрокат</span>
+        </div>
+        <p style="margin:0; font-size:13px; line-height:1.6; color:#71717a; max-width:34ch;">Почасовая аренда велосипедов в городе. Работаем ежедневно с 8:00 до 23:00.</p>
+      </div>
+      <div id="points" style="display:flex; flex-direction:column; gap:10px;">
+        <span style="font-size:13px; font-weight:600;">Точки выдачи</span>
+        <a href="#" style="font-size:13px; color:#71717a;">Парк Горького</a>
+        <a href="#" style="font-size:13px; color:#71717a;">Набережная</a>
+        <a href="#" style="font-size:13px; color:#71717a;">Центральный вокзал</a>
+      </div>
+      <div id="how" style="display:flex; flex-direction:column; gap:10px;">
+        <span style="font-size:13px; font-weight:600;">Сервис</span>
+        <a href="#" style="font-size:13px; color:#71717a;">Как это работает</a>
+        <a href="#" style="font-size:13px; color:#71717a;">Тарифы</a>
+        <a href="#" style="font-size:13px; color:#71717a;">Правила аренды</a>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <span style="font-size:13px; font-weight:600;">Поддержка</span>
+        <a href="#" style="font-size:13px; color:#71717a;">+7 900 000-00-00</a>
+        <a href="#" style="font-size:13px; color:#71717a;">help@veloprokat.ru</a>
+        <a href="#" style="font-size:13px; color:#71717a;">Telegram</a>
+      </div>
+    </div>
+    <div style="border-top:1px solid #e4e4e7;">
+      <div style="max-width:1180px; margin:0 auto; padding:16px 24px; display:flex; justify-content:space-between; gap:16px; font-size:12px; color:#a1a1aa;">
+        <span>© 2026 Велопрокат</span>
+        <span>Договор оферты · Политика конфиденциальности</span>
+      </div>
+    </div>
+  </footer>
+
+  <sc-if value="{{ dialogOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeDialog }}" style="position:fixed; inset:0; z-index:60; background:rgba(9,9,11,.45); display:flex; align-items:center; justify-content:center; padding:24px; animation:dcFade .12s ease;">
+      <div onClick="{{ stop }}" style="width:100%; max-width:420px; background:#ffffff; border-radius:14px; border:1px solid #e4e4e7; padding:24px; display:flex; flex-direction:column; gap:16px; animation:dcPop .16s ease; box-shadow:0 24px 60px -20px rgba(9,9,11,.35);">
+        <div>
+          <h3 style="margin:0 0 6px; font-size:17px; font-weight:600; letter-spacing:-.01em;">{{ dialogTitle }}</h3>
+          <p style="margin:0; font-size:14px; color:#71717a;">{{ dialogSub }}</p>
+        </div>
+        <sc-if value="{{ notBooked }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="font-size:13px; font-weight:500;">Начало аренды</label>
+              <input type="datetime-local" value="{{ start }}" onChange="{{ onStart }}" style="height:38px; padding:0 12px; border-radius:8px; border:1px solid #e4e4e7; font-family:inherit; font-size:14px; background:#ffffff; color:#09090b;">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="font-size:13px; font-weight:500;">Длительность</label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button onClick="{{ dec }}" style="width:38px; height:38px; border-radius:8px; border:1px solid #e4e4e7; background:#ffffff; font-family:inherit; font-size:16px; cursor:pointer;" style-hover="background:#f4f4f5;">−</button>
+                <div style="flex:1; height:38px; border:1px solid #e4e4e7; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:500;">{{ hoursLabel }}</div>
+                <button onClick="{{ inc }}" style="width:38px; height:38px; border-radius:8px; border:1px solid #e4e4e7; background:#ffffff; font-family:inherit; font-size:16px; cursor:pointer;" style-hover="background:#f4f4f5;">+</button>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="font-size:13px; font-weight:500;">Точка выдачи</label>
+              <select value="{{ point }}" onChange="{{ onPoint }}" style="height:38px; padding:0 10px; border-radius:8px; border:1px solid #e4e4e7; font-family:inherit; font-size:14px; background:#ffffff; color:#09090b;">
+                <sc-for list="{{ points }}" as="p" hint-placeholder-count="3">
+                  <option value="{{ p }}">{{ p }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-radius:10px; background:#f4f4f5; font-size:14px;">
+              <span style="color:#52525b;">{{ calcLabel }}</span>
+              <span style="font-weight:600; font-size:16px;">{{ total }} ₽</span>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+              <button onClick="{{ closeDialog }}" style="height:38px; padding:0 16px; border-radius:8px; border:1px solid #e4e4e7; background:#ffffff; font-family:inherit; font-size:14px; font-weight:500; cursor:pointer;" style-hover="background:#f4f4f5;">Отмена</button>
+              <button onClick="{{ confirm }}" style="height:38px; padding:0 18px; border-radius:8px; border:1px solid transparent; background:#18181b; color:#fafafa; font-family:inherit; font-size:14px; font-weight:500; cursor:pointer;" style-hover="background:#27272a;">Подтвердить</button>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ booked }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div style="padding:14px; border-radius:10px; background:#f4f4f5; font-size:14px; line-height:1.6; color:#52525b;">{{ receipt }}</div>
+            <button onClick="{{ closeDialog }}" style="height:38px; border-radius:8px; border:1px solid transparent; background:#18181b; color:#fafafa; font-family:inherit; font-size:14px; font-weight:500; cursor:pointer;" style-hover="background:#27272a;">Готово</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showRatings&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const BIKES = [
+  { id:'city-1', slug:'city cruiser', name:'City Cruiser 7', type:'Городской', price:180, rating:'4.8', available:true,
+    description:'Прямая посадка, 7 скоростей и корзина. Удобен для неспешных поездок по набережной и центру.',
+    longDescription:'Классический городской велосипед с низкой рамой и вертикальной посадкой. Полноразмерные крылья и защита цепи позволяют ездить в обычной одежде, а корзина спереди выдерживает до 5 кг. Подойдёт для прогулок и коротких поездок по городу.',
+    specs:['7 скоростей','Корзина','Крылья'],
+    rows:[{k:'Тип',v:'Городской'},{k:'Рама',v:'Алюминий, 18"'},{k:'Скорости',v:'7'},{k:'Колёса',v:'28"'},{k:'Вес',v:'14,2 кг'},{k:'Рост райдера',v:'160–185 см'}] },
+  { id:'ebike-1', slug:'e-bike urban', name:'Volt Urban E', type:'Электро', price:420, rating:'4.9', available:true,
+    description:'Электровелосипед с запасом хода 60 км. Разгон до 25 км/ч, три режима помощи педалированию.',
+    longDescription:'Электровелосипед с мотор-колесом 250 Вт и съёмной батареей на 480 Вт·ч. Три режима помощи, дисплей с показом остатка заряда. Полный заряд — около 60 км по городу, зарядка входит в аренду от 4 часов.',
+    specs:['60 км хода','25 км/ч','Дисплей'],
+    rows:[{k:'Тип',v:'Электро'},{k:'Мотор',v:'250 Вт'},{k:'Батарея',v:'480 Вт·ч'},{k:'Запас хода',v:'до 60 км'},{k:'Вес',v:'22 кг'},{k:'Рост райдера',v:'165–195 см'}] },
+  { id:'mtb-1', slug:'mountain trail', name:'Trail Rider 29', type:'Горный', price:260, rating:'4.7', available:true,
+    description:'Хардтейл с амортизационной вилкой и дисковыми тормозами. Для парков, грунта и лесных дорог.',
+    longDescription:'Горный хардтейл на колёсах 29" с ходом вилки 100 мм и гидравлическими дисковыми тормозами. Трансмиссия 1×11 закрывает и подъёмы, и быстрые участки. Резина с агрессивным протектором для грунта.',
+    specs:['1×11','Диски','Вилка 100 мм'],
+    rows:[{k:'Тип',v:'Горный хардтейл'},{k:'Рама',v:'Алюминий, 19"'},{k:'Трансмиссия',v:'1×11'},{k:'Колёса',v:'29"'},{k:'Вес',v:'13,4 кг'},{k:'Рост райдера',v:'170–195 см'}] },
+  { id:'fold-1', slug:'folding bike', name:'Fold Mini 20', type:'Складной', price:150, rating:'4.6', available:true,
+    description:'Складывается за 15 секунд и помещается в багажник. Хороший вариант для поездок с пересадками.',
+    longDescription:'Компактный складной велосипед на колёсах 20". Складывается за 15 секунд, в сложенном виде помещается в багажник или проходит в метро. Подходит для комбинированных маршрутов: велосипед плюс транспорт.',
+    specs:['Колёса 20"','6 скоростей','11 кг'],
+    rows:[{k:'Тип',v:'Складной'},{k:'Рама',v:'Сталь, универсальная'},{k:'Скорости',v:'6'},{k:'Колёса',v:'20"'},{k:'Вес',v:'11 кг'},{k:'Рост райдера',v:'150–190 см'}] },
+  { id:'kids-1', slug:'kids bike', name:'Junior 24', type:'Детский', price:110, rating:'4.5', available:false,
+    description:'Подростковый велосипед на колёсах 24" с ободными тормозами. Шлем выдаём бесплатно.',
+    longDescription:'Велосипед для подростков 8–13 лет. Лёгкая рама, простое переключение на 6 скоростей и мягкие ручки тормозов под детскую ладонь. Шлем и наколенники выдаются бесплатно вместе с велосипедом.',
+    specs:['Колёса 24"','Шлем в комплекте','6 скоростей'],
+    rows:[{k:'Тип',v:'Детский'},{k:'Возраст',v:'8–13 лет'},{k:'Скорости',v:'6'},{k:'Колёса',v:'24"'},{k:'Вес',v:'10,5 кг'},{k:'Рост райдера',v:'130–155 см'}] },
+  { id:'road-1', slug:'road bike', name:'Aero Road 105', type:'Шоссейный', price:340, rating:'4.9', available:true,
+    description:'Карбоновая вилка, узкая резина и Shimano 105. Для длинных выездов за город по асфальту.',
+    longDescription:'Шоссейный велосипед с алюминиевой рамой и карбоновой вилкой, группа Shimano 105 на 22 скорости. Резина 25 мм и контактные педали в комплекте (можно заменить на платформы). Для тренировок и загородных выездов.',
+    specs:['Shimano 105','Карбон-вилка','8,9 кг'],
+    rows:[{k:'Тип',v:'Шоссейный'},{k:'Рама',v:'Алюминий / карбон'},{k:'Трансмиссия',v:'Shimano 105, 2×11'},{k:'Колёса',v:'28"'},{k:'Вес',v:'8,9 кг'},{k:'Рост райдера',v:'170–190 см'}] }
+];
+
+const POINTS = ['Парк Горького', 'Набережная', 'Центральный вокзал'];
+const TYPES = ['Все', 'Городской', 'Электро', 'Горный', 'Складной'];
+
+function plural(n, a, b, c) {
+  const m = n % 100, k = n % 10;
+  if (m > 10 && m < 20) return c;
+  if (k === 1) return a;
+  if (k >= 2 && k <= 4) return b;
+  return c;
+}
+
+class Component extends DCLogic {
+  state = {
+    view: 'home',
+    selectedId: null,
+    filter: 'Все',
+    dialogId: null,
+    hours: 3,
+    start: '2026-08-19T12:00',
+    point: POINTS[0],
+    booked: false
+  };
+
+  open = (id) => { this.setState({ view: 'bike', selectedId: id, booked: false }); window.scrollTo(0, 0); };
+  book = (id, e) => { if (e) e.stopPropagation(); this.setState({ dialogId: id, booked: false }); };
+
+  renderVals() {
+    const s = this.state;
+    const sel = BIKES.find(b => b.id === s.selectedId) || BIKES[0];
+    const dialogBike = BIKES.find(b => b.id === s.dialogId);
+    const active = s.view === 'bike' ? sel : dialogBike;
+    const total = active ? active.price * s.hours : 0;
+    const list = s.filter === 'Все' ? BIKES : BIKES.filter(b => b.type === s.filter);
+
+    return {
+      isHome: s.view === 'home',
+      isBike: s.view === 'bike',
+      showRatings: this.props.showRatings ?? true,
+      goHome: () => this.setState({ view: 'home' }),
+      countLabel: `${list.length} ${plural(list.length, 'велосипед', 'велосипеда', 'велосипедов')} · оплата после поездки`,
+      filters: TYPES.map(t => ({
+        label: t,
+        border: s.filter === t ? 'transparent' : '#e4e4e7',
+        bg: s.filter === t ? '#18181b' : '#ffffff',
+        fg: s.filter === t ? '#fafafa' : '#09090b',
+        onClick: () => this.setState({ filter: t })
+      })),
+      visibleBikes: list.map(b => ({
+        ...b,
+        availLabel: b.available ? 'Свободен' : 'Занят до 18:00',
+        availBg: b.available ? '#ffffff' : '#18181b',
+        availFg: b.available ? '#09090b' : '#fafafa',
+        btnLabel: b.available ? 'Забронировать' : 'Недоступен',
+        btnBg: b.available ? '#18181b' : '#f4f4f5',
+        btnFg: b.available ? '#fafafa' : '#a1a1aa',
+        btnCursor: b.available ? 'pointer' : 'not-allowed',
+        disabled: !b.available,
+        onOpen: () => this.open(b.id),
+        onBook: (e) => b.available ? this.book(b.id, e) : e.stopPropagation()
+      })),
+      sel: { ...sel, gallery: ['вид сбоку', 'руль', 'трансмиссия'] },
+      points: POINTS,
+      point: s.point,
+      start: s.start,
+      hours: s.hours,
+      hoursLabel: `${s.hours} ${plural(s.hours, 'час', 'часа', 'часов')}`,
+      calcLabel: active ? `${active.price} ₽ × ${s.hours} ${plural(s.hours, 'час', 'часа', 'часов')}` : '',
+      total: total.toLocaleString('ru-RU'),
+      inc: () => this.setState(st => ({ hours: Math.min(24, st.hours + 1) })),
+      dec: () => this.setState(st => ({ hours: Math.max(1, st.hours - 1) })),
+      onStart: (e) => this.setState({ start: e.target.value }),
+      onPoint: (e) => this.setState({ point: e.target.value }),
+      confirm: () => this.setState({ dialogId: (s.dialogId || sel.id), booked: true }),
+      closeDialog: () => this.setState({ dialogId: null, booked: false }),
+      stop: (e) => e.stopPropagation(),
+      dialogOpen: !!s.dialogId,
+      booked: s.booked,
+      notBooked: !s.booked,
+      dialogTitle: s.booked ? 'Бронь подтверждена' : (dialogBike ? dialogBike.name : ''),
+      dialogSub: s.booked ? 'Мы отправили детали в Telegram' : 'Выберите время и точку выдачи',
+      receipt: dialogBike ? `${dialogBike.name} · ${s.hours} ${plural(s.hours, 'час', 'часа', 'часов')} · ${s.point}. Заберите велосипед по коду из сообщения, оплата после возврата — ${total.toLocaleString('ru-RU')} ₽.` : ''
+    };
+  }
+}
+</script>
+</body>
+</html>

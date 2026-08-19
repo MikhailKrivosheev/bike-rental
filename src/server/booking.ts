@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { BikeStatus, RentalStatus } from '@/generated/prisma/enums';
-import { PICKUP_HOUR, accessoryIds, isRentalDuration, rentalPrice } from '@/lib/rental';
+import { MAX_HOURS, MIN_HOURS, accessoryIds, pickupTimes, rentalPrice } from '@/lib/rental';
 import { prisma } from '@/lib/prisma';
 import { sendVerificationCode } from '@/server/email';
 
@@ -20,13 +20,14 @@ export type BookingResult =
   | { ok: false; error: string };
 
 export type VerificationResult =
-  | { ok: true; endsAt: string }
+  | { ok: true; startsAt: string; endsAt: string }
   | { ok: false; error: string };
 
 const bookingSchema = z.object({
   bikeId: z.string().min(1),
   date: z.iso.date(),
-  hours: z.number().int().refine(isRentalDuration),
+  time: z.enum(pickupTimes as [string, ...string[]]),
+  hours: z.number().int().min(MIN_HOURS).max(MAX_HOURS),
   accessories: z.array(z.enum(accessoryIds as [string, ...string[]])).default([]),
   email: z.email(),
 });
@@ -37,10 +38,9 @@ function hashCode(code: string) {
   return createHash('sha256').update(code).digest('hex');
 }
 
-function startOfRental(date: string) {
-  const startsAt = new Date(`${date}T00:00:00`);
-  startsAt.setHours(PICKUP_HOUR, 0, 0, 0);
-  return startsAt;
+function startOfRental(date: string, time: string) {
+  // Local time: the browser sends the day the renter picked, not a UTC instant.
+  return new Date(`${date}T${time}:00`);
 }
 
 /**
@@ -55,9 +55,9 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
     return { ok: false, error: t('invalidInput') };
   }
 
-  const { bikeId, date, hours, accessories, email } = parsed.data;
+  const { bikeId, date, time, hours, accessories, email } = parsed.data;
 
-  const startsAt = startOfRental(date);
+  const startsAt = startOfRental(date, time);
   const endsAt = new Date(startsAt.getTime() + hours * 60 * 60 * 1000);
 
   if (endsAt <= new Date()) {
@@ -159,5 +159,9 @@ export async function confirmBooking(rentalId: string, code: string): Promise<Ve
   revalidatePath(`/${locale}`);
   revalidatePath(`/${locale}/bikes/${rental.bikeId}`);
 
-  return { ok: true, endsAt: rental.endsAt.toISOString() };
+  return {
+    ok: true,
+    startsAt: rental.startsAt.toISOString(),
+    endsAt: rental.endsAt.toISOString(),
+  };
 }
