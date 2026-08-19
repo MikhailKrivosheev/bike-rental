@@ -2,6 +2,8 @@ import createMiddleware from 'next-intl/middleware';
 
 import { routing } from '@/i18n/routing';
 
+// next-intl still names its factory `createMiddleware`; the file convention is
+// what Next.js renamed to `proxy`.
 export default createMiddleware(routing);
 
 export const config = {

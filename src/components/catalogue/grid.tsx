@@ -3,28 +3,17 @@
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
-import { Card, type CardModel } from '@/components/catalogue/card';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-
-type Filter = {
-  value: string;
-  label: string;
-};
-
-type GridProps = {
-  bikes: CardModel[];
-  filters: Filter[];
-};
-
-const ALL = 'all';
+import { Card } from 'Components/catalogue/card';
+import { ALL_TYPES, FILTER_BUTTON_CLASS } from 'Components/catalogue/constants';
+import type { GridProps } from 'Components/catalogue/types';
+import { Button } from 'Components/ui/button';
 
 export function Grid({ bikes, filters }: GridProps) {
   const translate = useTranslations('Catalogue');
-  const [active, setActive] = useState(ALL);
+  const [active, setActive] = useState(ALL_TYPES);
 
-  const visible = active === ALL ? bikes : bikes.filter((bike) => bike.type === active);
-  const options = [{ value: ALL, label: translate('filterAll') }, ...filters];
+  const visible = active === ALL_TYPES ? bikes : bikes.filter((bike) => bike.type === active);
+  const options = [{ value: ALL_TYPES, label: translate('filterAll') }, ...filters];
 
   return (
     <>
@@ -41,7 +30,7 @@ export function Grid({ bikes, filters }: GridProps) {
               type="button"
               size="sm"
               variant={option.value === active ? 'default' : 'outline'}
-              className={cn('h-[34px] px-3.5 text-[13px]')}
+              className={FILTER_BUTTON_CLASS}
               aria-pressed={option.value === active}
               onClick={() => setActive(option.value)}
             >

@@ -1,42 +1,40 @@
-'use client';
+"use client";
 
-import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { useMemo, useState, useTransition } from 'react';
-import type { DateRange } from 'react-day-picker';
-import { toast } from 'sonner';
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useTransition } from "react";
+import type { DateRange } from "react-day-picker";
+import { toast } from "sonner";
 
-import { DEFAULT_HOURS, clampHours, daysBetween, pickupTimes, quoteRental } from '@/lib/rental';
-import { confirmBooking, createBooking } from '@/server/booking';
-
-export type BookingBike = {
-  id: string;
-  model: string;
-  pricePerHour: number;
-  pricePerDay: number;
-  stationName: string;
-};
-
-export type BookingStep = 'details' | 'email' | 'code' | 'done';
+import {
+  DEFAULT_HOURS,
+  clampHours,
+  daysBetween,
+  pickupTimes,
+  quoteRental,
+} from "Lib/rental";
+import type { BookingBike, BookingStep } from "Components/booking/types";
+import { confirmBooking, createBooking } from "@/server/booking";
 
 /** `2026-08-20` in the renter's own timezone, which is what the server expects. */
 function toDateInput(date: Date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
     date.getDate(),
-  ).padStart(2, '0')}`;
+  ).padStart(2, "0")}`;
 }
 
 export function useBooking(bike: BookingBike) {
-  const translate = useTranslations('Booking');
+  const translate = useTranslations("Booking");
+  const locale = useLocale();
   const router = useRouter();
 
-  const [step, setStep] = useState<BookingStep>('details');
+  const [step, setStep] = useState<BookingStep>("details");
   const [range, setRange] = useState<DateRange | undefined>();
   const [time, setTime] = useState(pickupTimes[2] ?? pickupTimes[0]);
   const [hours, setHours] = useState(DEFAULT_HOURS);
   const [accessories, setAccessories] = useState<string[]>([]);
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [rentalId, setRentalId] = useState<string | null>(null);
   const [startsAt, setStartsAt] = useState<Date | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -49,13 +47,13 @@ export function useBooking(bike: BookingBike) {
   );
 
   function reset() {
-    setStep('details');
+    setStep("details");
     setRange(undefined);
     setTime(pickupTimes[2] ?? pickupTimes[0]);
     setHours(DEFAULT_HOURS);
     setAccessories([]);
-    setEmail('');
-    setCode('');
+    setEmail("");
+    setCode("");
     setRentalId(null);
     setStartsAt(null);
   }
@@ -72,15 +70,18 @@ export function useBooking(bike: BookingBike) {
     }
 
     startTransition(async () => {
-      const result = await createBooking({
-        bikeId: bike.id,
-        date: toDateInput(range.from as Date),
-        endDate: days > 0 && range.to ? toDateInput(range.to) : undefined,
-        time,
-        hours,
-        accessories,
-        email,
-      });
+      const result = await createBooking(
+        {
+          bikeId: bike.id,
+          date: toDateInput(range.from as Date),
+          endDate: days > 0 && range.to ? toDateInput(range.to) : undefined,
+          time,
+          hours,
+          accessories,
+          email,
+        },
+        locale,
+      );
 
       if (!result.ok) {
         toast.error(result.error);
@@ -88,7 +89,7 @@ export function useBooking(bike: BookingBike) {
       }
 
       setRentalId(result.rentalId);
-      setStep('code');
+      setStep("code");
     });
   }
 
@@ -98,21 +99,21 @@ export function useBooking(bike: BookingBike) {
     }
 
     startTransition(async () => {
-      const result = await confirmBooking(rentalId, value);
+      const result = await confirmBooking(rentalId, value, locale);
 
       if (!result.ok) {
         toast.error(result.error);
-        setCode('');
+        setCode("");
         return;
       }
 
       setStartsAt(new Date(result.startsAt));
-      setStep('done');
+      setStep("done");
     });
   }
 
   function finish() {
-    if (step === 'done') {
+    if (step === "done") {
       router.refresh();
     }
     reset();
@@ -145,5 +146,3 @@ export function useBooking(bike: BookingBike) {
     finish,
   };
 }
-
-export type Booking = ReturnType<typeof useBooking>;

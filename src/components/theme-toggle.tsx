@@ -4,7 +4,7 @@ import { RiMoonLine, RiSunLine } from '@remixicon/react';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 
-import { Button } from '@/components/ui/button';
+import { Button } from 'Components/ui/button';
 
 export function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();

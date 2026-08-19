@@ -2,14 +2,25 @@ import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
-import { Panel } from '@/components/booking/panel';
-import { Button } from '@/components/ui/button';
-import { BikeStatus, RentalStatus } from '@/generated/prisma/enums';
+import { Panel } from 'Components/booking/panel';
+import { Container } from 'Components/shared/container';
+import { Button } from 'Components/ui/button';
+import { BikeStatus } from '@/generated/prisma/enums';
 import { Link } from '@/i18n/navigation';
-import { formatPrice } from '@/lib/format';
-import { prisma } from '@/lib/prisma';
+import { formatPrice } from 'Lib/format';
+import { getBike, getCatalogueBikes } from '@/server/catalogue';
 
-export const dynamic = 'force-dynamic';
+// Prerendered and refreshed in the background; the `bikes` tag flushes it as
+// soon as this bike is booked.
+export const revalidate = 300;
+
+// Prerenders the current fleet; a bike added later still renders on demand and
+// is cached from then on (`dynamicParams` defaults to true).
+export async function generateStaticParams() {
+  const bikes = await getCatalogueBikes();
+
+  return bikes.map((bike) => ({ id: bike.id }));
+}
 
 export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[id]'>) {
   const { id } = await params;
@@ -30,24 +41,14 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
     getTranslations('BikeDescriptions'),
   ]);
 
-  const bike = await prisma.bike.findUnique({
-    where: { id },
-    include: {
-      station: true,
-      rentals: {
-        where: { status: RentalStatus.ACTIVE },
-        orderBy: { endsAt: 'desc' },
-        take: 1,
-      },
-    },
-  });
+  const bike = await getBike(id);
 
   if (!bike) {
     notFound();
   }
 
   const isAvailable = bike.status === BikeStatus.AVAILABLE;
-  const freesUpAt = bike.rentals.at(0)?.endsAt;
+  const freesUpAt = bike.freesUpAt ? new Date(bike.freesUpAt) : undefined;
 
   // Descriptions and spec sheets live in the message catalogue so they can be
   // translated; anything missing falls back to the database value.
@@ -60,7 +61,7 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
     : [];
 
   return (
-    <main className="mx-auto w-full max-w-[1180px] flex-1 px-6 pt-8 pb-20">
+    <Container as="main" className="flex-1 pt-8 pb-20">
       <Button asChild variant="outline" size="sm" className="mb-6 h-8 text-[13px]">
         <Link href="/">{translateDetail('back')}</Link>
       </Button>
@@ -112,7 +113,7 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
               model: bike.model,
               pricePerHour: bike.pricePerHour,
               pricePerDay: bike.pricePerDay,
-              stationName: bike.station?.name ?? '—',
+              stationName: bike.stationName ?? '—',
             }}
           />
         ) : (
@@ -138,6 +139,6 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
           </aside>
         )}
       </div>
-    </main>
+    </Container>
   );
 }

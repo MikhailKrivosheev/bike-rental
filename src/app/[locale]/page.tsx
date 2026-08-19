@@ -1,13 +1,15 @@
 import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
 
-import type { CardModel } from '@/components/catalogue/card';
-import { Grid } from '@/components/catalogue/grid';
-import { BikeStatus, BikeType, RentalStatus } from '@/generated/prisma/enums';
-import { formatPrice } from '@/lib/format';
-import { prisma } from '@/lib/prisma';
+import { Grid } from 'Components/catalogue/grid';
+import type { CardModel } from 'Components/catalogue/types';
+import { Section } from 'Components/shared/section';
+import { BikeStatus, BikeType } from '@/generated/prisma/enums';
+import { formatPrice } from 'Lib/format';
+import { getCatalogueBikes } from '@/server/catalogue';
 
-// The catalogue reads the database, so render it per request instead of at build time.
-export const dynamic = 'force-dynamic';
+// Prerendered and refreshed in the background; booking a bike flushes it early
+// through the `bikes` tag, so the grid never shows a stale availability badge.
+export const revalidate = 300;
 
 export default async function Home() {
   const [
@@ -28,22 +30,11 @@ export default async function Home() {
     getTranslations('BikeDescriptions'),
   ]);
 
-  const bikes = await prisma.bike.findMany({
-    where: { status: { not: BikeStatus.RETIRED } },
-    include: {
-      station: true,
-      rentals: {
-        where: { status: RentalStatus.ACTIVE },
-        orderBy: { endsAt: 'desc' },
-        take: 1,
-      },
-    },
-    orderBy: [{ status: 'asc' }, { pricePerHour: 'asc' }],
-  });
+  const bikes = await getCatalogueBikes();
 
   const cards: CardModel[] = bikes.map((bike) => {
     const isAvailable = bike.status === BikeStatus.AVAILABLE;
-    const freesUpAt = bike.rentals.at(0)?.endsAt;
+    const freesUpAt = bike.freesUpAt ? new Date(bike.freesUpAt) : undefined;
 
     return {
       id: bike.id,
@@ -59,7 +50,7 @@ export default async function Home() {
       pricePerDay: bike.pricePerDay,
       pricePerDayLabel: formatPrice(bike.pricePerDay, locale),
       imageUrl: bike.imageUrl,
-      stationName: bike.station?.name ?? '—',
+      stationName: bike.stationName ?? '—',
       isAvailable,
       availabilityLabel: isAvailable
         ? translateCatalogue('free')
@@ -73,7 +64,7 @@ export default async function Home() {
 
   return (
     <main className="flex-1">
-      <section className="mx-auto w-full max-w-[1180px] px-6 pt-16 pb-10">
+      <Section top="xl" bottom="lg">
         <div className="mb-5 inline-flex h-[26px] items-center gap-2 rounded-full border bg-muted/40 px-2.5 text-xs text-muted-foreground">
           <span className="size-1.5 rounded-full bg-emerald-500" />
           {translateHero('available', { count: availableCount })}
@@ -84,9 +75,9 @@ export default async function Home() {
         <p className="max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground">
           {translateHero('subtitle')}
         </p>
-      </section>
+      </Section>
 
-      <section id="catalogue" className="mx-auto w-full max-w-[1180px] scroll-mt-20 px-6 pb-6">
+      <Section id="catalogue" anchored top="none" bottom="sm">
         {cards.length === 0 ? (
           <div className="rounded-[14px] border p-6">
             <h2 className="mb-1.5 text-xl font-semibold">{translateCatalogue('emptyTitle')}</h2>
@@ -101,7 +92,7 @@ export default async function Home() {
             }))}
           />
         )}
-      </section>
+      </Section>
     </main>
   );
 }

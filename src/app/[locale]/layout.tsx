@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { Footer } from "Components/layout/footer";
+import { Header } from "Components/layout/header";
+import { ThemeProvider } from "Components/theme-provider";
+import { Toaster } from "Components/ui/sonner";
 import { routing } from "@/i18n/routing";
-import { cn } from "@/lib/utils";
-import { fontVariables } from "@/styles/fonts";
+import { cn } from "Lib/utils";
+import { fontVariables } from "Styles/fonts";
 
-import "@/styles/globals.css";
+import "Styles/globals.css";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -36,14 +36,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     notFound();
   }
 
-  setRequestLocale(locale);
+  const htmlClassName = cn("h-full font-sans antialiased", fontVariables);
 
   return (
-    <html
-      lang={locale}
-      suppressHydrationWarning
-      className={cn("h-full font-sans antialiased", fontVariables)}
-    >
+    <html lang={locale} suppressHydrationWarning className={htmlClassName}>
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <NextIntlClientProvider>

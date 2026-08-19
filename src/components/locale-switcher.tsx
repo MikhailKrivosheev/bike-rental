@@ -4,13 +4,13 @@ import { RiGlobalLine } from '@remixicon/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from 'Components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from 'Components/ui/dropdown-menu';
 import { getPathname, usePathname } from '@/i18n/navigation';
 import { localeLabels, locales, type Locale } from '@/i18n/routing';
 

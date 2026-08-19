@@ -3,18 +3,15 @@
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
 
-import { Fields } from '@/components/booking/fields';
-import { Steps } from '@/components/booking/steps';
-import { Total } from '@/components/booking/total';
-import { type BookingBike, useBooking } from '@/components/booking/hooks/use-booking';
-import { Button } from '@/components/ui/button';
-import { Dialog as DialogRoot, DialogContent } from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
-import { formatPrice } from '@/lib/format';
-
-type PanelProps = {
-  bike: BookingBike;
-};
+import { Fields } from 'Components/booking/fields';
+import { Steps } from 'Components/booking/steps';
+import { Total } from 'Components/booking/total';
+import { useBooking } from 'Components/booking/hooks/use-booking';
+import type { PanelProps } from 'Components/booking/types';
+import { Button } from 'Components/ui/button';
+import { Dialog as DialogRoot, DialogContent } from 'Components/ui/dialog';
+import { Separator } from 'Components/ui/separator';
+import { formatPrice } from 'Lib/format';
 
 /** Booking entry point on the bike page: fields sit in the sticky sidebar. */
 export function Panel({ bike }: PanelProps) {

@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
-import { prisma } from '@/lib/prisma';
+import { Container } from 'Components/shared/container';
+import { prisma } from 'Lib/prisma';
 
 export async function Footer() {
   const [translate, header, stations] = await Promise.all([
@@ -22,7 +23,7 @@ export async function Footer() {
 
   return (
     <footer className="border-t bg-muted/40">
-      <div className="mx-auto grid w-full max-w-[1180px] gap-8 px-6 py-11 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <Container className="grid gap-8 py-11 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <div className="mb-3 flex items-center gap-2.5">
             <span className="flex size-6 items-center justify-center rounded-[7px] bg-primary text-xs font-semibold text-primary-foreground">
@@ -45,13 +46,13 @@ export async function Footer() {
             ))}
           </div>
         ))}
-      </div>
+      </Container>
 
       <div className="border-t">
-        <div className="mx-auto flex w-full max-w-[1180px] flex-col justify-between gap-2 px-6 py-4 text-xs text-muted-foreground sm:flex-row">
+        <Container className="flex flex-col justify-between gap-2 py-4 text-xs text-muted-foreground sm:flex-row">
           <span>{translate('copyright', { year: new Date().getFullYear() })}</span>
           <span>{translate('legal')}</span>
-        </div>
+        </Container>
       </div>
     </footer>
   );

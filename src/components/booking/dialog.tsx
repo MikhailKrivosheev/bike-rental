@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 
-import { Fields } from '@/components/booking/fields';
-import { Steps } from '@/components/booking/steps';
-import { Total } from '@/components/booking/total';
-import { type BookingBike, useBooking } from '@/components/booking/hooks/use-booking';
-import { Button } from '@/components/ui/button';
+import { Fields } from 'Components/booking/fields';
+import { Steps } from 'Components/booking/steps';
+import { Total } from 'Components/booking/total';
+import { useBooking } from 'Components/booking/hooks/use-booking';
+import type { DialogProps } from 'Components/booking/types';
+import { Button } from 'Components/ui/button';
 import {
   // The shadcn primitive keeps its own name so this file can export `Dialog`.
   Dialog as DialogRoot,
@@ -16,12 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-
-type DialogProps = {
-  bike: BookingBike;
-  className?: string;
-};
+} from 'Components/ui/dialog';
 
 /** Booking entry point on a catalogue card: the whole flow lives in the dialog. */
 export function Dialog({ bike, className }: DialogProps) {

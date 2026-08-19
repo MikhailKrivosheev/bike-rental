@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
+import { Button } from 'Components/ui/button';
 
 /**
  * Placeholders from the design: there is no auth yet, so both buttons only

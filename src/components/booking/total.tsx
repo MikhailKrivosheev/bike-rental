@@ -2,29 +2,20 @@
 
 import { useLocale } from 'next-intl';
 
-import { AnimatedPrice } from '@/components/booking/animated-price';
-import type { Booking, BookingBike } from '@/components/booking/hooks/use-booking';
-import { formatPrice } from '@/lib/format';
-import { cn } from '@/lib/utils';
-
-type TotalProps = {
-  booking: Booking;
-  bike: BookingBike;
-  /** The dialog puts the summary on a muted plate; the sidebar keeps it flat. */
-  plate?: boolean;
-};
+import { AnimatedPrice } from 'Components/booking/animated-price';
+import { TOTAL_CLASS, TOTAL_PLATE_CLASS } from 'Components/booking/constants';
+import type { TotalProps } from 'Components/booking/types';
+import { formatPrice } from 'Lib/format';
+import { cn } from 'Lib/utils';
 
 export function Total({ booking, bike, plate = false }: TotalProps) {
   const { translate } = booking;
   const locale = useLocale();
 
+  const totalClassName = cn(TOTAL_CLASS, plate && TOTAL_PLATE_CLASS);
+
   return (
-    <div
-      className={cn(
-        'flex items-center justify-between gap-4 text-sm',
-        plate && 'rounded-[10px] bg-muted px-3.5 py-3',
-      )}
-    >
+    <div className={totalClassName}>
       <span className="text-muted-foreground">
         {booking.quote.unit === 'day'
           ? translate('calculationDays', {

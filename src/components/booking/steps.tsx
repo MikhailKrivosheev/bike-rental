@@ -2,19 +2,14 @@
 
 import { useFormatter } from 'next-intl';
 
-import type { Booking, BookingBike } from '@/components/booking/hooks/use-booking';
-import { Button } from '@/components/ui/button';
-import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Label } from '@/components/ui/label';
-import { AnimatedPrice } from '@/components/booking/animated-price';
-
-type StepsProps = {
-  booking: Booking;
-  bike: BookingBike;
-  onCancel: () => void;
-};
+import { CODE_LENGTH, CODE_SLOTS } from 'Components/booking/constants';
+import type { StepsProps } from 'Components/booking/types';
+import { Button } from 'Components/ui/button';
+import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from 'Components/ui/dialog';
+import { Input } from 'Components/ui/input';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from 'Components/ui/input-otp';
+import { Label } from 'Components/ui/label';
+import { AnimatedPrice } from 'Components/booking/animated-price';
 
 /** The email → code → confirmation part of the flow, shared by both entry points. */
 export function Steps({ booking, bike, onCancel }: StepsProps) {
@@ -79,14 +74,14 @@ export function Steps({ booking, bike, onCancel }: StepsProps) {
 
         <div className="flex justify-center py-2">
           <InputOTP
-            maxLength={6}
+            maxLength={CODE_LENGTH}
             value={booking.code}
             onChange={booking.setCode}
             onComplete={booking.submitCode}
             disabled={booking.isPending}
           >
             <InputOTPGroup>
-              {[0, 1, 2, 3, 4, 5].map((index) => (
+              {CODE_SLOTS.map((index) => (
                 <InputOTPSlot key={index} index={index} />
               ))}
             </InputOTPGroup>
@@ -99,7 +94,7 @@ export function Steps({ booking, bike, onCancel }: StepsProps) {
           </Button>
           <Button
             onClick={() => booking.submitCode(booking.code)}
-            disabled={booking.isPending || booking.code.length < 6}
+            disabled={booking.isPending || booking.code.length < CODE_LENGTH}
           >
             {booking.isPending ? translate('confirming') : translate('confirm')}
           </Button>

@@ -2,36 +2,28 @@
 
 import Image from 'next/image';
 
-import { Dialog } from '@/components/booking/dialog';
-import { Button } from '@/components/ui/button';
+import { Dialog } from 'Components/booking/dialog';
+import {
+  CARD_BADGE_AVAILABLE_CLASS,
+  CARD_BADGE_BOOKED_CLASS,
+  CARD_BADGE_CLASS,
+  CARD_IMAGE_BOOKED_CLASS,
+  CARD_IMAGE_CLASS,
+  CARD_IMAGE_SIZES,
+} from 'Components/catalogue/constants';
+import type { CardProps } from 'Components/catalogue/types';
+import { Button } from 'Components/ui/button';
 import { Link } from '@/i18n/navigation';
-import { cn } from '@/lib/utils';
-
-export type CardModel = {
-  id: string;
-  model: string;
-  type: string;
-  typeLabel: string;
-  description: string;
-  specs: string[];
-  price: number;
-  priceLabel: string;
-  pricePerDay: number;
-  pricePerDayLabel: string;
-  imageUrl: string | null;
-  stationName: string;
-  isAvailable: boolean;
-  availabilityLabel: string;
-};
-
-type CardProps = {
-  bike: CardModel;
-  perHourLabel: string;
-  perDayLabel: string;
-  bookedLabel: string;
-};
+import { cn } from 'Lib/utils';
 
 export function Card({ bike, perHourLabel, perDayLabel, bookedLabel }: CardProps) {
+  const imageClassName = cn(CARD_IMAGE_CLASS, !bike.isAvailable && CARD_IMAGE_BOOKED_CLASS);
+
+  const availabilityClassName = cn(
+    CARD_BADGE_CLASS,
+    bike.isAvailable ? CARD_BADGE_AVAILABLE_CLASS : CARD_BADGE_BOOKED_CLASS,
+  );
+
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-[14px] border bg-card transition-[box-shadow,border-color] duration-150 hover:border-ring/40 hover:shadow-[0_8px_24px_-12px_rgb(0_0_0/0.18)]">
       <div className="relative aspect-4/3 border-b bg-muted">
@@ -40,22 +32,15 @@ export function Card({ bike, perHourLabel, perDayLabel, bookedLabel }: CardProps
             src={bike.imageUrl}
             alt={bike.model}
             fill
-            sizes="(min-width: 1180px) 380px, (min-width: 640px) 45vw, 100vw"
-            className={cn('object-cover', !bike.isAvailable && 'opacity-50 grayscale')}
+            sizes={CARD_IMAGE_SIZES}
+            className={imageClassName}
           />
         ) : null}
 
         <span className="absolute top-3 left-3 inline-flex h-6 items-center rounded-full border bg-background px-2.5 text-xs font-medium">
           {bike.typeLabel}
         </span>
-        <span
-          className={cn(
-            'absolute top-3 right-3 inline-flex h-6 items-center rounded-full px-2.5 text-xs font-medium',
-            bike.isAvailable
-              ? 'border bg-background'
-              : 'bg-primary text-primary-foreground',
-          )}
-        >
+        <span className={availabilityClassName}>
           {bike.availabilityLabel}
         </span>
       </div>

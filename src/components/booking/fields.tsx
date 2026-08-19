@@ -1,31 +1,25 @@
 'use client';
 
 import { RiCalendarLine, RiSubtractLine, RiAddLine } from '@remixicon/react';
-import { enUS, pt } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { useFormatter, useLocale } from 'next-intl';
 import { useMemo } from 'react';
 
-import type { Booking, BookingBike } from '@/components/booking/hooks/use-booking';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { dateFnsLocales } from 'Components/booking/constants';
+import type { FieldsProps } from 'Components/booking/types';
+import { Button } from 'Components/ui/button';
+import { Calendar } from 'Components/ui/calendar';
+import { Checkbox } from 'Components/ui/checkbox';
+import { Label } from 'Components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from 'Components/ui/popover';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { MAX_DAYS, MAX_HOURS, MIN_HOURS, accessories, pickupTimes } from '@/lib/rental';
-
-const dateFnsLocales = { en: enUS, pt } as const;
-
-type FieldsProps = {
-  booking: Booking;
-  bike: BookingBike;
-};
+} from 'Components/ui/select';
+import { MAX_DAYS, MAX_HOURS, MIN_HOURS, accessories, pickupTimes } from 'Lib/rental';
 
 export function Fields({ booking, bike }: FieldsProps) {
   const { translate } = booking;

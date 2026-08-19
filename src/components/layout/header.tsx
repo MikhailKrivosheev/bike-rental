@@ -1,8 +1,9 @@
 import { getTranslations } from 'next-intl/server';
 
-import { AuthButtons } from '@/components/layout/auth-buttons';
-import { LocaleSwitcher } from '@/components/locale-switcher';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { AuthButtons } from 'Components/layout/auth-buttons';
+import { LocaleSwitcher } from 'Components/locale-switcher';
+import { Container } from 'Components/shared/container';
+import { ThemeToggle } from 'Components/theme-toggle';
 import { Link } from '@/i18n/navigation';
 
 export async function Header() {
@@ -16,7 +17,7 @@ export async function Header() {
 
   return (
     <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-[1180px] items-center gap-8 px-6">
+      <Container className="flex h-16 items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
             {translate('brandInitial')}
@@ -37,7 +38,7 @@ export async function Header() {
           <ThemeToggle />
           <AuthButtons />
         </div>
-      </div>
+      </Container>
     </header>
   );
 }

@@ -1,11 +1,15 @@
-import { hasLocale } from 'next-intl';
-import { getRequestConfig } from 'next-intl/server';
+import { hasLocale } from "next-intl";
+import { getRequestConfig } from "next-intl/server";
+import * as rootParams from "next/root-params";
 
-import { routing } from './routing';
+import { routing } from "./routing";
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  const requested = await requestLocale;
-  const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
+export default getRequestConfig(async ({ locale: requested }) => {
+  // Server Actions can't read root params, so they pass the locale explicitly.
+  const candidate = requested ?? (await rootParams.locale());
+  const locale = hasLocale(routing.locales, candidate)
+    ? candidate
+    : routing.defaultLocale;
 
   return {
     locale,
