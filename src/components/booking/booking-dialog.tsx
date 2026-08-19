@@ -26,7 +26,7 @@ type BookingDialogProps = {
 export function BookingDialog({ bike, className }: BookingDialogProps) {
   const booking = useBooking(bike);
   const [open, setOpen] = useState(false);
-  const { t } = booking;
+  const { translate } = booking;
 
   function onOpenChange(next: boolean) {
     setOpen(next);
@@ -40,7 +40,7 @@ export function BookingDialog({ bike, className }: BookingDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button size="sm" className={className} onClick={(event) => event.stopPropagation()}>
-          {t('trigger')}
+          {translate('trigger')}
         </Button>
       </DialogTrigger>
 
@@ -48,8 +48,8 @@ export function BookingDialog({ bike, className }: BookingDialogProps) {
         {booking.step === 'details' ? (
           <>
             <DialogHeader>
-              <DialogTitle className="text-[17px]">{t('title', { model: bike.model })}</DialogTitle>
-              <DialogDescription>{t('subtitle')}</DialogDescription>
+              <DialogTitle className="text-[17px]">{translate('title', { model: bike.model })}</DialogTitle>
+              <DialogDescription>{translate('subtitle')}</DialogDescription>
             </DialogHeader>
 
             <BookingFields booking={booking} bike={bike} />
@@ -57,10 +57,10 @@ export function BookingDialog({ bike, className }: BookingDialogProps) {
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                {t('cancel')}
+                {translate('cancel')}
               </Button>
               <Button onClick={() => booking.setStep('email')} disabled={!booking.canContinue}>
-                {t('continue')}
+                {translate('continue')}
               </Button>
             </DialogFooter>
           </>

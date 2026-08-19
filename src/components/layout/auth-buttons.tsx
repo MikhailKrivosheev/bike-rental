@@ -10,15 +10,15 @@ import { Button } from '@/components/ui/button';
  * say so. Replace with real navigation once accounts exist.
  */
 export function AuthButtons() {
-  const t = useTranslations('Header');
+  const translate = useTranslations('Header');
 
   return (
     <div className="hidden items-center gap-2.5 sm:flex">
-      <Button variant="outline" className="h-9 px-3.5" onClick={() => toast(t('comingSoon'))}>
-        {t('myBookings')}
+      <Button variant="outline" className="h-9 px-3.5" onClick={() => toast(translate('comingSoon'))}>
+        {translate('myBookings')}
       </Button>
-      <Button className="h-9 px-3.5" onClick={() => toast(t('comingSoon'))}>
-        {t('signIn')}
+      <Button className="h-9 px-3.5" onClick={() => toast(translate('comingSoon'))}>
+        {translate('signIn')}
       </Button>
     </div>
   );

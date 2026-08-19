@@ -15,7 +15,7 @@ type BookingTotalProps = {
 };
 
 export function BookingTotal({ booking, bike, plate = false }: BookingTotalProps) {
-  const { t } = booking;
+  const { translate } = booking;
   const locale = useLocale();
 
   return (
@@ -27,11 +27,11 @@ export function BookingTotal({ booking, bike, plate = false }: BookingTotalProps
     >
       <span className="text-muted-foreground">
         {booking.quote.unit === 'day'
-          ? t('calculationDays', {
+          ? translate('calculationDays', {
               price: formatPrice(bike.pricePerDay, locale),
               days: booking.quote.units,
             })
-          : t('calculation', {
+          : translate('calculation', {
               price: formatPrice(bike.pricePerHour, locale),
               hours: booking.quote.units,
             })}

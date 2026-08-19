@@ -14,7 +14,14 @@ export const dynamic = 'force-dynamic';
 export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[id]'>) {
   const { id } = await params;
 
-  const [locale, format, t, tCatalogue, tSpecs, tDescription] = await Promise.all([
+  const [
+    locale,
+    format,
+    translateDetail,
+    translateCatalogue,
+    translateSpecs,
+    translateDescription,
+  ] = await Promise.all([
     getLocale(),
     getFormatter(),
     getTranslations('BikeDetail'),
@@ -44,18 +51,18 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
 
   // Descriptions and spec sheets live in the message catalogue so they can be
   // translated; anything missing falls back to the database value.
-  const description = tDescription.has(bike.id)
-    ? tDescription(bike.id)
-    : (bike.description ?? t('noDescription'));
+  const description = translateDescription.has(bike.id)
+    ? translateDescription(bike.id)
+    : (bike.description ?? translateDetail('noDescription'));
 
-  const specs = tSpecs.has(bike.id)
-    ? Object.entries(tSpecs.raw(bike.id) as Record<string, string>)
+  const specs = translateSpecs.has(bike.id)
+    ? Object.entries(translateSpecs.raw(bike.id) as Record<string, string>)
     : [];
 
   return (
     <main className="mx-auto w-full max-w-[1180px] flex-1 px-6 pt-8 pb-20">
       <Button asChild variant="outline" size="sm" className="mb-6 h-8 text-[13px]">
-        <Link href="/">{t('back')}</Link>
+        <Link href="/">{translateDetail('back')}</Link>
       </Button>
 
       <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,1fr)]">
@@ -81,7 +88,7 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
 
             {specs.length > 0 ? (
               <>
-                <h2 className="mb-3 text-[15px] font-semibold">{t('specs')}</h2>
+                <h2 className="mb-3 text-[15px] font-semibold">{translateDetail('specs')}</h2>
                 <dl className="overflow-hidden rounded-xl border">
                   {specs.map(([label, value]) => (
                     <div
@@ -115,18 +122,18 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
                 <span className="text-[28px] font-semibold tracking-[-0.02em]">
                   {formatPrice(bike.pricePerHour, locale)}
                 </span>
-                <span className="text-sm text-muted-foreground">{t('perHour')}</span>
+                <span className="text-sm text-muted-foreground">{translateDetail('perHour')}</span>
               </div>
               <span className="text-sm text-muted-foreground">
-                {formatPrice(bike.pricePerDay, locale)} {t('perDay')}
+                {formatPrice(bike.pricePerDay, locale)} {translateDetail('perDay')}
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
               {freesUpAt
-                ? tCatalogue('bookedUntil', {
+                ? translateCatalogue('bookedUntil', {
                     time: format.dateTime(freesUpAt, { dateStyle: 'medium', timeStyle: 'short' }),
                   })
-                : tCatalogue('booked')}
+                : translateCatalogue('booked')}
             </p>
           </aside>
         )}

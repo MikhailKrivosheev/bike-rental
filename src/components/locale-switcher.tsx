@@ -15,7 +15,7 @@ import { getPathname, usePathname } from '@/i18n/navigation';
 import { localeLabels, locales, type Locale } from '@/i18n/routing';
 
 export function LocaleSwitcher() {
-  const t = useTranslations('Header');
+  const translate = useTranslations('Header');
   const activeLocale = useLocale();
   const pathname = usePathname();
   const [isPending, setIsPending] = useState(false);
@@ -33,7 +33,7 @@ export function LocaleSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t('language')} disabled={isPending}>
+        <Button variant="ghost" size="icon" aria-label={translate('language')} disabled={isPending}>
           <RiGlobalLine className="size-4" />
         </Button>
       </DropdownMenuTrigger>

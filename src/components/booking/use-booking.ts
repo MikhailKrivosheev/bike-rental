@@ -27,7 +27,7 @@ function toDateInput(date: Date) {
 }
 
 export function useBooking(bike: BookingBike) {
-  const t = useTranslations('Booking');
+  const translate = useTranslations('Booking');
   const router = useRouter();
 
   const [step, setStep] = useState<BookingStep>('details');
@@ -121,7 +121,7 @@ export function useBooking(bike: BookingBike) {
   }
 
   return {
-    t,
+    translate,
     step,
     setStep,
     range,

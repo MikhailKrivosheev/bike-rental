@@ -20,18 +20,18 @@ type BikeGridProps = {
 const ALL = 'all';
 
 export function BikeGrid({ bikes, filters }: BikeGridProps) {
-  const t = useTranslations('Catalogue');
+  const translate = useTranslations('Catalogue');
   const [active, setActive] = useState(ALL);
 
   const visible = active === ALL ? bikes : bikes.filter((bike) => bike.type === active);
-  const options = [{ value: ALL, label: t('filterAll') }, ...filters];
+  const options = [{ value: ALL, label: translate('filterAll') }, ...filters];
 
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-6 border-b pb-5">
         <div>
-          <h2 className="mb-1.5 text-xl font-semibold tracking-[-0.01em]">{t('title')}</h2>
-          <p className="text-sm text-muted-foreground">{t('count', { count: bikes.length })}</p>
+          <h2 className="mb-1.5 text-xl font-semibold tracking-[-0.01em]">{translate('title')}</h2>
+          <p className="text-sm text-muted-foreground">{translate('count', { count: bikes.length })}</p>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -52,16 +52,16 @@ export function BikeGrid({ bikes, filters }: BikeGridProps) {
       </div>
 
       {visible.length === 0 ? (
-        <p className="py-16 text-center text-sm text-muted-foreground">{t('noMatches')}</p>
+        <p className="py-16 text-center text-sm text-muted-foreground">{translate('noMatches')}</p>
       ) : (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(320px,100%),1fr))] gap-5 pt-7 pb-18">
           {visible.map((bike) => (
             <BikeCard
               key={bike.id}
               bike={bike}
-              perHourLabel={t('perHour')}
-              perDayLabel={t('perDay')}
-              bookedLabel={t('booked')}
+              perHourLabel={translate('perHour')}
+              perDayLabel={translate('perDay')}
+              bookedLabel={translate('booked')}
             />
           ))}
         </div>

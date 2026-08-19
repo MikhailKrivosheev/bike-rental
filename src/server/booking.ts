@@ -45,7 +45,6 @@ export type VerificationResult =
 const bookingSchema = z.object({
   bikeId: z.string().min(1),
   date: z.iso.date(),
-  /** Set when a date range was picked; the rental is then charged per day. */
   endDate: z.iso.date().optional(),
   time: z.enum(pickupTimes as [string, ...string[]]),
   hours: z.number().int().min(MIN_HOURS).max(MAX_HOURS),
@@ -60,20 +59,15 @@ function hashCode(code: string) {
 }
 
 function atTime(date: string, time: string) {
-  // Local time: the browser sends the day the renter picked, not a UTC instant.
   return new Date(`${date}T${time}:00`);
 }
 
-/**
- * Creates a pending rental and emails a one-time code. The rental only becomes
- * active — and the bike unavailable — once the code is confirmed.
- */
 export async function createBooking(input: BookingInput): Promise<BookingResult> {
-  const t = await getTranslations('Booking.errors');
+  const translateError = await getTranslations('Booking.errors');
   const parsed = bookingSchema.safeParse(input);
 
   if (!parsed.success) {
-    return { ok: false, error: t('invalidInput') };
+    return { ok: false, error: translateError('invalidInput') };
   }
 
   const { bikeId, date, endDate, time, hours, accessories, email } = parsed.data;
@@ -82,7 +76,7 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
   const days = endDate ? daysBetween(startsAt, atTime(endDate, time)) : 0;
 
   if (days < 0 || days > MAX_DAYS) {
-    return { ok: false, error: t('invalidInput') };
+    return { ok: false, error: translateError('invalidInput') };
   }
 
   const endsAt =
@@ -91,20 +85,19 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
       : new Date(startsAt.getTime() + hours * 60 * 60 * 1000);
 
   if (endsAt <= new Date()) {
-    return { ok: false, error: t('pastDate') };
+    return { ok: false, error: translateError('pastDate') };
   }
 
   const bike = await prisma.bike.findUnique({ where: { id: bikeId } });
 
   if (!bike) {
-    return { ok: false, error: t('bikeNotFound') };
+    return { ok: false, error: translateError('bikeNotFound') };
   }
 
   if (bike.status !== BikeStatus.AVAILABLE) {
-    return { ok: false, error: t('bikeUnavailable') };
+    return { ok: false, error: translateError('bikeUnavailable') };
   }
 
-  // Prices always come from the database, never from the submitted form.
   const { total: totalPrice } = quoteRental(bike, { days, hours, accessories });
 
   const user = await prisma.user.upsert({
@@ -141,7 +134,7 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
 }
 
 export async function confirmBooking(rentalId: string, code: string): Promise<VerificationResult> {
-  const [locale, t] = await Promise.all([getLocale(), getTranslations('Booking.errors')]);
+  const [locale, translateError] = await Promise.all([getLocale(), getTranslations('Booking.errors')]);
 
   const rental = await prisma.rental.findUnique({
     where: { id: rentalId },
@@ -149,17 +142,17 @@ export async function confirmBooking(rentalId: string, code: string): Promise<Ve
   });
 
   if (!rental?.verification || rental.status !== RentalStatus.PENDING) {
-    return { ok: false, error: t('bookingNotFound') };
+    return { ok: false, error: translateError('bookingNotFound') };
   }
 
   const { verification } = rental;
 
   if (verification.consumedAt || verification.expiresAt < new Date()) {
-    return { ok: false, error: t('codeExpired') };
+    return { ok: false, error: translateError('codeExpired') };
   }
 
   if (verification.attempts >= MAX_ATTEMPTS) {
-    return { ok: false, error: t('tooManyAttempts') };
+    return { ok: false, error: translateError('tooManyAttempts') };
   }
 
   const submitted = code.trim();
@@ -172,7 +165,7 @@ export async function confirmBooking(rentalId: string, code: string): Promise<Ve
       data: { attempts: { increment: 1 } },
     });
 
-    return { ok: false, error: t('wrongCode') };
+    return { ok: false, error: translateError('wrongCode') };
   }
 
   await prisma.$transaction([

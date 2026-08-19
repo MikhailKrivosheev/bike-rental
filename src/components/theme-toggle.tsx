@@ -8,13 +8,13 @@ import { Button } from '@/components/ui/button';
 
 export function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
-  const t = useTranslations('Header');
+  const translate = useTranslations('Header');
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      aria-label={t('toggleTheme')}
+      aria-label={translate('toggleTheme')}
       onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
     >
       <RiSunLine className="size-4 dark:hidden" />

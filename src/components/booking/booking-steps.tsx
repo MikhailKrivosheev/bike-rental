@@ -18,15 +18,15 @@ type BookingStepsProps = {
 
 /** The email → code → confirmation part of the flow, shared by both entry points. */
 export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
-  const { t } = booking;
+  const { translate } = booking;
   const format = useFormatter();
 
   if (booking.step === 'email') {
     return (
       <>
         <DialogHeader>
-          <DialogTitle className="text-[17px]">{t('emailTitle')}</DialogTitle>
-          <DialogDescription>{t('emailDescription')}</DialogDescription>
+          <DialogTitle className="text-[17px]">{translate('emailTitle')}</DialogTitle>
+          <DialogDescription>{translate('emailDescription')}</DialogDescription>
         </DialogHeader>
 
         <form
@@ -38,7 +38,7 @@ export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
         >
           <div className="flex flex-col gap-2">
             <Label htmlFor="booking-email" className="text-[13px]">
-              {t('emailLabel')}
+              {translate('emailLabel')}
             </Label>
             <Input
               id="booking-email"
@@ -52,16 +52,16 @@ export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
           </div>
 
           <div className="flex items-center justify-between rounded-[10px] bg-muted px-3.5 py-3 text-sm">
-            <span className="text-muted-foreground">{t('total')}</span>
+            <span className="text-muted-foreground">{translate('total')}</span>
             <AnimatedPrice cents={booking.total} className="text-base font-semibold" />
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onCancel}>
-              {t('cancel')}
+              {translate('cancel')}
             </Button>
             <Button type="submit" disabled={booking.isPending}>
-              {booking.isPending ? t('sending') : t('sendCode')}
+              {booking.isPending ? translate('sending') : translate('sendCode')}
             </Button>
           </DialogFooter>
         </form>
@@ -73,8 +73,8 @@ export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
     return (
       <>
         <DialogHeader>
-          <DialogTitle className="text-[17px]">{t('otpTitle')}</DialogTitle>
-          <DialogDescription>{t('otpDescription', { email: booking.email })}</DialogDescription>
+          <DialogTitle className="text-[17px]">{translate('otpTitle')}</DialogTitle>
+          <DialogDescription>{translate('otpDescription', { email: booking.email })}</DialogDescription>
         </DialogHeader>
 
         <div className="flex justify-center py-2">
@@ -95,13 +95,13 @@ export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onCancel}>
-            {t('cancel')}
+            {translate('cancel')}
           </Button>
           <Button
             onClick={() => booking.submitCode(booking.code)}
             disabled={booking.isPending || booking.code.length < 6}
           >
-            {booking.isPending ? t('confirming') : t('confirm')}
+            {booking.isPending ? translate('confirming') : translate('confirm')}
           </Button>
         </DialogFooter>
       </>
@@ -110,26 +110,26 @@ export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
 
   if (booking.step === 'done' && booking.startsAt) {
     const rows = [
-      { label: t('summaryBike'), value: bike.model },
+      { label: translate('summaryBike'), value: bike.model },
       {
-        label: t('summaryStart'),
+        label: translate('summaryStart'),
         value: format.dateTime(booking.startsAt, { dateStyle: 'medium', timeStyle: 'short' }),
       },
       {
-        label: t('summaryDuration'),
+        label: translate('summaryDuration'),
         value:
           booking.quote.unit === 'day'
-            ? t('days', { days: booking.quote.units })
-            : t('hours', { hours: booking.quote.units }),
+            ? translate('days', { days: booking.quote.units })
+            : translate('hours', { hours: booking.quote.units }),
       },
     ];
 
     return (
       <>
         <DialogHeader>
-          <DialogTitle className="text-[17px]">{t('successTitle')}</DialogTitle>
+          <DialogTitle className="text-[17px]">{translate('successTitle')}</DialogTitle>
           <DialogDescription>
-            {t('successDescription', { email: booking.email })}
+            {translate('successDescription', { email: booking.email })}
           </DialogDescription>
         </DialogHeader>
 
@@ -141,7 +141,7 @@ export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
             </div>
           ))}
           <div className="flex justify-between gap-4 border-t pt-2.5">
-            <dt className="text-muted-foreground">{t('summaryTotal')}</dt>
+            <dt className="text-muted-foreground">{translate('summaryTotal')}</dt>
             <dd>
               <AnimatedPrice cents={booking.total} className="font-semibold" />
             </dd>
@@ -150,7 +150,7 @@ export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
 
         <DialogFooter>
           <Button className="w-full" onClick={onCancel}>
-            {t('done')}
+            {translate('done')}
           </Button>
         </DialogFooter>
       </>

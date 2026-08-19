@@ -21,7 +21,7 @@ export function BookingPanel({ bike }: BookingPanelProps) {
   const booking = useBooking(bike);
   const locale = useLocale();
   const [open, setOpen] = useState(false);
-  const { t } = booking;
+  const { translate } = booking;
 
   function onOpenChange(next: boolean) {
     setOpen(next);
@@ -38,10 +38,10 @@ export function BookingPanel({ bike }: BookingPanelProps) {
           <span className="text-[28px] font-semibold tracking-[-0.02em]">
             {formatPrice(bike.pricePerHour, locale)}
           </span>
-          <span className="text-sm text-muted-foreground">{t('perHourShort')}</span>
+          <span className="text-sm text-muted-foreground">{translate('perHourShort')}</span>
         </div>
         <span className="text-sm text-muted-foreground">
-          {formatPrice(bike.pricePerDay, locale)} {t('perDayShort')}
+          {formatPrice(bike.pricePerDay, locale)} {translate('perDayShort')}
         </span>
       </div>
 
@@ -61,10 +61,10 @@ export function BookingPanel({ bike }: BookingPanelProps) {
           setOpen(true);
         }}
       >
-        {t('trigger')}
+        {translate('trigger')}
       </Button>
 
-      <p className="text-center text-xs text-muted-foreground">{t('cancellationNote')}</p>
+      <p className="text-center text-xs text-muted-foreground">{translate('cancellationNote')}</p>
 
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[420px]">
