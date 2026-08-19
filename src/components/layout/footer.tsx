@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
-export async function SiteFooter() {
+export async function Footer() {
   const t = await getTranslations('Footer');
 
   return (

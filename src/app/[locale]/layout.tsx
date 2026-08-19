@@ -1,32 +1,17 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Geist_Mono, Noto_Serif, Roboto } from "next/font/google";
 import { notFound } from "next/navigation";
 
-import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
+import { fontVariables } from "@/styles/fonts";
 
-import "../globals.css";
-
-const roboto = Roboto({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
-
-const notoSerif = Noto_Serif({
-  variable: "--font-heading",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import "@/styles/globals.css";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -57,19 +42,14 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     <html
       lang={locale}
       suppressHydrationWarning
-      className={cn(
-        "h-full font-sans antialiased",
-        roboto.variable,
-        notoSerif.variable,
-        geistMono.variable,
-      )}
+      className={cn("h-full font-sans antialiased", fontVariables)}
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <NextIntlClientProvider>
-            <SiteHeader />
+            <Header />
             {children}
-            <SiteFooter />
+            <Footer />
             <Toaster />
           </NextIntlClientProvider>
         </ThemeProvider>

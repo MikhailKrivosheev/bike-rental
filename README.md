@@ -59,6 +59,8 @@ src/
   components/ui/       shadcn/ui components
   components/theme-*   theme provider and light/dark toggle
   components/locale-switcher.tsx
+  styles/globals.css   Tailwind entry point and theme tokens
+  styles/fonts.ts      next/font declarations and their CSS variables
   lib/prisma.ts        Prisma Client singleton
   lib/format.ts        locale-aware price formatting
   generated/prisma/    generated Prisma Client (not committed)

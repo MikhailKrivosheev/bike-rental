@@ -5,7 +5,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 
-export async function SiteHeader() {
+export async function Header() {
   const t = await getTranslations('Header');
 
   return (
