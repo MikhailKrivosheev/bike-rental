@@ -33,11 +33,16 @@ export function BookingPanel({ bike }: BookingPanelProps) {
 
   return (
     <aside className="top-24 flex flex-col gap-4 rounded-2xl border p-[22px] lg:sticky">
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-[28px] font-semibold tracking-[-0.02em]">
-          {formatPrice(bike.pricePerHour, locale)}
+      <div className="flex flex-col">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[28px] font-semibold tracking-[-0.02em]">
+            {formatPrice(bike.pricePerHour, locale)}
+          </span>
+          <span className="text-sm text-muted-foreground">{t('perHourShort')}</span>
+        </div>
+        <span className="text-sm text-muted-foreground">
+          {formatPrice(bike.pricePerDay, locale)} {t('perDayShort')}
         </span>
-        <span className="text-sm text-muted-foreground">{t('perHourShort')}</span>
       </div>
 
       <Separator />

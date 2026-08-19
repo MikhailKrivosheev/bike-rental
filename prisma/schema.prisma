@@ -58,6 +58,8 @@ model Bike {
   status       BikeStatus @default(AVAILABLE)
   /// Rental price per hour, in cents.
   pricePerHour Int
+  /// Rental price per full day, in cents — used when a date range is booked.
+  pricePerDay  Int
   imageUrl     String?
   description  String?
   stationId    String?

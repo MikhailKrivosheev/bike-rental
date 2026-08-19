@@ -45,7 +45,7 @@ pnpm dev             # http://localhost:3000
 ```
 dictionaries/          en.json, pt.json — translation catalogues
 prisma/
-  schema.prisma        models: User, Station, Bike, Rental
+  schema.prisma        models: User, Station, Bike, Rental, VerificationCode
   migrations/          migrations
   seed.ts              sample data (3 bikes: gravel, MTB, city)
 public/Images/Bikes/   bike photos
@@ -84,8 +84,10 @@ language or theme switcher, no add-ons and no confirmation step: those stay as b
   `src/i18n/routing.ts` plus a matching `dictionaries/<locale>.json`.
 - Bike descriptions are translated under `BikeDescriptions.<bike id>` and fall back to
   `Bike.description` from the database.
-- Booking flow: pick a date, duration and add-ons in the dialog, then confirm with a
-  6-digit code emailed to the renter. The rental is created as `PENDING` and only becomes
+- Booking flow: pick a date (or a date range), a start time, add-ons and — for single-day
+  rentals — a duration, then confirm with a 6-digit code emailed to the renter.
+- Bikes carry two prices. One picked day is charged `pricePerHour × hours`; a range is
+  charged `pricePerDay × days`, where the end date is exclusive (1st → 5th is four days). The rental is created as `PENDING` and only becomes
   `ACTIVE` — marking the bike `RENTED` — once the code is verified.
 - Prices are always recomputed on the server from `Bike.pricePerHour` and
   `src/lib/rental.ts`; the amount submitted by the client is ignored.

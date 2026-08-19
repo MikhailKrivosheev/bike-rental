@@ -40,7 +40,8 @@
     "perHour": "/ hour",
     "free": "Available",
     "bookedUntil": "Booked until {time}",
-    "booked": "Booked"
+    "booked": "Booked",
+    "perDay": "/ day"
   },
   "BikeType": {
     "GRAVEL": "Gravel",
@@ -58,7 +59,8 @@
     "specs": "Specifications",
     "noDescription": "No description yet.",
     "perHour": "/ hour",
-    "notFound": "Bike not found"
+    "notFound": "Bike not found",
+    "perDay": "/ day"
   },
   "BikeDescriptions": {
     "gravel": "A fast, forgiving gravel bike for mixed surfaces — wide tyres, relaxed geometry and mounts for everything you need on a long day out.",
@@ -68,8 +70,8 @@
   "Booking": {
     "trigger": "Book",
     "title": "{model}",
-    "date": "Start date",
-    "pickDate": "Pick a date",
+    "date": "Dates",
+    "pickDate": "Pick a date or range",
     "duration": "Duration",
     "accessories": "Add-ons",
     "accessory": {
@@ -116,7 +118,12 @@
     "summaryDuration": "Duration",
     "summaryTotal": "Total",
     "done": "Done",
-    "perHourShort": "/ hour"
+    "perHourShort": "/ hour",
+    "rangeHint": "Pick a second date to rent by the day.",
+    "days": "{days, plural, one {# day} other {# days}}",
+    "calculationDays": "{price} × {days, plural, one {# day} other {# days}}",
+    "perDayShort": "/ day",
+    "summaryEnd": "Return"
   },
   "Hero": {
     "available": "{count, plural, =0 {No bikes available right now} one {# bike available right now} other {# bikes available right now}}",

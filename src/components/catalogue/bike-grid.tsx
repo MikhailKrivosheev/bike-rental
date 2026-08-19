@@ -60,6 +60,7 @@ export function BikeGrid({ bikes, filters }: BikeGridProps) {
               key={bike.id}
               bike={bike}
               perHourLabel={t('perHour')}
+              perDayLabel={t('perDay')}
               bookedLabel={t('booked')}
             />
           ))}

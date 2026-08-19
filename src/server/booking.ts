@@ -7,7 +7,15 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { BikeStatus, RentalStatus } from '@/generated/prisma/enums';
-import { MAX_HOURS, MIN_HOURS, accessoryIds, pickupTimes, rentalPrice } from '@/lib/rental';
+import {
+  MAX_DAYS,
+  MAX_HOURS,
+  MIN_HOURS,
+  accessoryIds,
+  daysBetween,
+  pickupTimes,
+  quoteRental,
+} from '@/lib/rental';
 import { prisma } from '@/lib/prisma';
 import { sendVerificationCode } from '@/server/email';
 
@@ -26,6 +34,8 @@ export type VerificationResult =
 const bookingSchema = z.object({
   bikeId: z.string().min(1),
   date: z.iso.date(),
+  /** Set when a date range was picked; the rental is then charged per day. */
+  endDate: z.iso.date().optional(),
   time: z.enum(pickupTimes as [string, ...string[]]),
   hours: z.number().int().min(MIN_HOURS).max(MAX_HOURS),
   accessories: z.array(z.enum(accessoryIds as [string, ...string[]])).default([]),
@@ -38,7 +48,7 @@ function hashCode(code: string) {
   return createHash('sha256').update(code).digest('hex');
 }
 
-function startOfRental(date: string, time: string) {
+function atTime(date: string, time: string) {
   // Local time: the browser sends the day the renter picked, not a UTC instant.
   return new Date(`${date}T${time}:00`);
 }
@@ -55,10 +65,19 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
     return { ok: false, error: t('invalidInput') };
   }
 
-  const { bikeId, date, time, hours, accessories, email } = parsed.data;
+  const { bikeId, date, endDate, time, hours, accessories, email } = parsed.data;
 
-  const startsAt = startOfRental(date, time);
-  const endsAt = new Date(startsAt.getTime() + hours * 60 * 60 * 1000);
+  const startsAt = atTime(date, time);
+  const days = endDate ? daysBetween(startsAt, atTime(endDate, time)) : 0;
+
+  if (days < 0 || days > MAX_DAYS) {
+    return { ok: false, error: t('invalidInput') };
+  }
+
+  const endsAt =
+    days > 0
+      ? atTime(endDate as string, time)
+      : new Date(startsAt.getTime() + hours * 60 * 60 * 1000);
 
   if (endsAt <= new Date()) {
     return { ok: false, error: t('pastDate') };
@@ -75,7 +94,7 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
   }
 
   // Prices always come from the database, never from the submitted form.
-  const totalPrice = rentalPrice(bike.pricePerHour, hours, accessories);
+  const { total: totalPrice } = quoteRental(bike, { days, hours, accessories });
 
   const user = await prisma.user.upsert({
     where: { email },

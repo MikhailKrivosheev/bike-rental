@@ -3,15 +3,17 @@
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
+import type { DateRange } from 'react-day-picker';
 import { toast } from 'sonner';
 
-import { DEFAULT_HOURS, clampHours, pickupTimes, rentalPrice } from '@/lib/rental';
+import { DEFAULT_HOURS, clampHours, daysBetween, pickupTimes, quoteRental } from '@/lib/rental';
 import { confirmBooking, createBooking } from '@/server/booking';
 
 export type BookingBike = {
   id: string;
   model: string;
   pricePerHour: number;
+  pricePerDay: number;
   stationName: string;
 };
 
@@ -29,7 +31,7 @@ export function useBooking(bike: BookingBike) {
   const router = useRouter();
 
   const [step, setStep] = useState<BookingStep>('details');
-  const [date, setDate] = useState<Date | undefined>();
+  const [range, setRange] = useState<DateRange | undefined>();
   const [time, setTime] = useState(pickupTimes[2] ?? pickupTimes[0]);
   const [hours, setHours] = useState(DEFAULT_HOURS);
   const [accessories, setAccessories] = useState<string[]>([]);
@@ -39,14 +41,17 @@ export function useBooking(bike: BookingBike) {
   const [startsAt, setStartsAt] = useState<Date | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const total = useMemo(
-    () => rentalPrice(bike.pricePerHour, hours, accessories),
-    [bike.pricePerHour, hours, accessories],
+  // A single picked day is charged by the hour, a range of days by the day.
+  const days = range?.from && range.to ? daysBetween(range.from, range.to) : 0;
+
+  const quote = useMemo(
+    () => quoteRental(bike, { days, hours, accessories }),
+    [bike, days, hours, accessories],
   );
 
   function reset() {
     setStep('details');
-    setDate(undefined);
+    setRange(undefined);
     setTime(pickupTimes[2] ?? pickupTimes[0]);
     setHours(DEFAULT_HOURS);
     setAccessories([]);
@@ -63,14 +68,15 @@ export function useBooking(bike: BookingBike) {
   }
 
   function submitEmail() {
-    if (!date) {
+    if (!range?.from) {
       return;
     }
 
     startTransition(async () => {
       const result = await createBooking({
         bikeId: bike.id,
-        date: toDateInput(date),
+        date: toDateInput(range.from as Date),
+        endDate: days > 0 && range.to ? toDateInput(range.to) : undefined,
         time,
         hours,
         accessories,
@@ -118,8 +124,9 @@ export function useBooking(bike: BookingBike) {
     t,
     step,
     setStep,
-    date,
-    setDate,
+    range,
+    setRange,
+    days,
     time,
     setTime,
     hours,
@@ -131,9 +138,10 @@ export function useBooking(bike: BookingBike) {
     code,
     setCode,
     startsAt,
-    total,
+    quote,
+    total: quote.total,
     isPending,
-    canContinue: Boolean(date),
+    canContinue: Boolean(range?.from),
     submitEmail,
     submitCode,
     finish,

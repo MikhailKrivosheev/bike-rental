@@ -40,7 +40,8 @@
     "perHour": "/ hora",
     "free": "Disponível",
     "bookedUntil": "Reservada até {time}",
-    "booked": "Reservada"
+    "booked": "Reservada",
+    "perDay": "/ dia"
   },
   "BikeType": {
     "GRAVEL": "Gravel",
@@ -58,7 +59,8 @@
     "specs": "Características",
     "noDescription": "Ainda sem descrição.",
     "perHour": "/ hora",
-    "notFound": "Bicicleta não encontrada"
+    "notFound": "Bicicleta não encontrada",
+    "perDay": "/ dia"
   },
   "BikeDescriptions": {
     "gravel": "Uma bicicleta de gravel rápida e tolerante para pisos mistos — pneus largos, geometria descontraída e suportes para tudo o que precisa num dia longo.",
@@ -68,8 +70,8 @@
   "Booking": {
     "trigger": "Reservar",
     "title": "{model}",
-    "date": "Data de início",
-    "pickDate": "Escolha uma data",
+    "date": "Datas",
+    "pickDate": "Escolha uma data ou intervalo",
     "duration": "Duração",
     "accessories": "Extras",
     "accessory": {
@@ -116,7 +118,12 @@
     "summaryDuration": "Duração",
     "summaryTotal": "Total",
     "done": "Concluído",
-    "perHourShort": "/ hora"
+    "perHourShort": "/ hora",
+    "rangeHint": "Escolha uma segunda data para alugar ao dia.",
+    "days": "{days, plural, one {# dia} other {# dias}}",
+    "calculationDays": "{price} × {days, plural, one {# dia} other {# dias}}",
+    "perDayShort": "/ dia",
+    "summaryEnd": "Devolução"
   },
   "Hero": {
     "available": "{count, plural, =0 {Nenhuma bicicleta disponível agora} one {# bicicleta disponível agora} other {# bicicletas disponíveis agora}}",

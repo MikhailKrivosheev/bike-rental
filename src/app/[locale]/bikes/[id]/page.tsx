@@ -104,16 +104,22 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
               id: bike.id,
               model: bike.model,
               pricePerHour: bike.pricePerHour,
+              pricePerDay: bike.pricePerDay,
               stationName: bike.station?.name ?? '—',
             }}
           />
         ) : (
           <aside className="flex flex-col gap-4 rounded-2xl border p-[22px] lg:sticky lg:top-24">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-[28px] font-semibold tracking-[-0.02em]">
-                {formatPrice(bike.pricePerHour, locale)}
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-[28px] font-semibold tracking-[-0.02em]">
+                  {formatPrice(bike.pricePerHour, locale)}
+                </span>
+                <span className="text-sm text-muted-foreground">{t('perHour')}</span>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                {formatPrice(bike.pricePerDay, locale)} {t('perDay')}
               </span>
-              <span className="text-sm text-muted-foreground">{t('perHour')}</span>
             </div>
             <p className="text-sm text-muted-foreground">
               {freesUpAt

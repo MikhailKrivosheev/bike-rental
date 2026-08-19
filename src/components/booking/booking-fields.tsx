@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MAX_HOURS, MIN_HOURS, accessories, pickupTimes } from '@/lib/rental';
+import { MAX_DAYS, MAX_HOURS, MIN_HOURS, accessories, pickupTimes } from '@/lib/rental';
 
 const dateFnsLocales = { en: enUS, pt } as const;
 
@@ -38,6 +38,14 @@ export function BookingFields({ booking, bike }: BookingFieldsProps) {
     return start;
   }, []);
 
+  const { from, to } = booking.range ?? {};
+
+  const label = from
+    ? booking.days > 0 && to
+      ? `${format.dateTime(from, { dateStyle: 'medium' })} – ${format.dateTime(to, { dateStyle: 'medium' })}`
+      : format.dateTime(from, { dateStyle: 'long' })
+    : t('pickDate');
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
@@ -46,22 +54,24 @@ export function BookingFields({ booking, bike }: BookingFieldsProps) {
           <PopoverTrigger asChild>
             <Button variant="outline" className="h-[38px] justify-start font-normal">
               <RiCalendarLine className="size-4 text-muted-foreground" />
-              {booking.date
-                ? format.dateTime(booking.date, { dateStyle: 'long' })
-                : t('pickDate')}
+              {label}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
             <Calendar
-              mode="single"
-              selected={booking.date}
-              onSelect={booking.setDate}
+              mode="range"
+              selected={booking.range}
+              onSelect={booking.setRange}
               disabled={{ before: today }}
+              max={MAX_DAYS + 1}
               locale={dateFnsLocales[locale as keyof typeof dateFnsLocales] ?? enUS}
               autoFocus
             />
           </PopoverContent>
         </Popover>
+        <p className="text-xs text-muted-foreground">
+          {booking.days > 0 ? t('days', { days: booking.days }) : t('rangeHint')}
+        </p>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -82,39 +92,41 @@ export function BookingFields({ booking, bike }: BookingFieldsProps) {
         </Select>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label className="text-[13px]">{t('duration')}</Label>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="size-[38px] shrink-0"
-            aria-label={t('decrease')}
-            disabled={booking.hours <= MIN_HOURS}
-            onClick={() => booking.setHours(booking.hours - 1)}
-          >
-            <RiSubtractLine className="size-4" />
-          </Button>
-          <div
-            aria-live="polite"
-            className="flex h-[38px] flex-1 items-center justify-center rounded-lg border text-sm font-medium"
-          >
-            {t('hours', { hours: booking.hours })}
+      {booking.days === 0 ? (
+        <div className="flex flex-col gap-2">
+          <Label className="text-[13px]">{t('duration')}</Label>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="size-[38px] shrink-0"
+              aria-label={t('decrease')}
+              disabled={booking.hours <= MIN_HOURS}
+              onClick={() => booking.setHours(booking.hours - 1)}
+            >
+              <RiSubtractLine className="size-4" />
+            </Button>
+            <div
+              aria-live="polite"
+              className="flex h-[38px] flex-1 items-center justify-center rounded-lg border text-sm font-medium"
+            >
+              {t('hours', { hours: booking.hours })}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="size-[38px] shrink-0"
+              aria-label={t('increase')}
+              disabled={booking.hours >= MAX_HOURS}
+              onClick={() => booking.setHours(booking.hours + 1)}
+            >
+              <RiAddLine className="size-4" />
+            </Button>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="size-[38px] shrink-0"
-            aria-label={t('increase')}
-            disabled={booking.hours >= MAX_HOURS}
-            onClick={() => booking.setHours(booking.hours + 1)}
-          >
-            <RiAddLine className="size-4" />
-          </Button>
         </div>
-      </div>
+      ) : null}
 
       <div className="flex flex-col gap-2">
         <Label className="text-[13px]">{t('pickupPoint')}</Label>

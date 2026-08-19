@@ -47,6 +47,8 @@ export default async function Home() {
       specs: tSpecs.has(bike.id) ? (tSpecs.raw(bike.id) as string[]) : [],
       price: bike.pricePerHour,
       priceLabel: formatPrice(bike.pricePerHour, locale),
+      pricePerDay: bike.pricePerDay,
+      pricePerDayLabel: formatPrice(bike.pricePerDay, locale),
       imageUrl: bike.imageUrl,
       stationName: bike.station?.name ?? '—',
       isAvailable,

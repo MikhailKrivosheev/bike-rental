@@ -15,6 +15,7 @@ const bikes = [
     model: 'Canyon Grizl 7',
     type: BikeType.GRAVEL,
     pricePerHour: 900,
+    pricePerDay: 4500,
     imageUrl: '/Images/Bikes/gravel.webp',
     description:
       'A fast, forgiving gravel bike for mixed surfaces — wide tyres, relaxed geometry and mounts for everything you need on a long day out.',
@@ -24,6 +25,7 @@ const bikes = [
     model: 'Merida Big Nine 400',
     type: BikeType.MTB,
     pricePerHour: 1100,
+    pricePerDay: 5500,
     imageUrl: '/Images/Bikes/MTB.webp',
     description:
       'A hardtail mountain bike built for trails and singletrack: air fork, hydraulic disc brakes and grippy 29" tyres.',
@@ -33,6 +35,7 @@ const bikes = [
     model: "Electra Loft 7D Step-Thru",
     type: BikeType.CITY,
     pricePerHour: 600,
+    pricePerDay: 3000,
     imageUrl: '/Images/Bikes/urban.webp',
     description:
       'A women\'s step-through city bike with an upright riding position, fenders and a rack — perfect for commuting and relaxed rides.',

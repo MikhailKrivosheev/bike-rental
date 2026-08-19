@@ -115,7 +115,13 @@ export function BookingSteps({ booking, bike, onCancel }: BookingStepsProps) {
         label: t('summaryStart'),
         value: format.dateTime(booking.startsAt, { dateStyle: 'medium', timeStyle: 'short' }),
       },
-      { label: t('summaryDuration'), value: t('hours', { hours: booking.hours }) },
+      {
+        label: t('summaryDuration'),
+        value:
+          booking.quote.unit === 'day'
+            ? t('days', { days: booking.quote.units })
+            : t('hours', { hours: booking.quote.units }),
+      },
     ];
 
     return (

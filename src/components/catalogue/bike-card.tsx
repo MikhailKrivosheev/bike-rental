@@ -16,6 +16,8 @@ export type BikeCardModel = {
   specs: string[];
   price: number;
   priceLabel: string;
+  pricePerDay: number;
+  pricePerDayLabel: string;
   imageUrl: string | null;
   stationName: string;
   isAvailable: boolean;
@@ -25,10 +27,11 @@ export type BikeCardModel = {
 type BikeCardProps = {
   bike: BikeCardModel;
   perHourLabel: string;
+  perDayLabel: string;
   bookedLabel: string;
 };
 
-export function BikeCard({ bike, perHourLabel, bookedLabel }: BikeCardProps) {
+export function BikeCard({ bike, perHourLabel, perDayLabel, bookedLabel }: BikeCardProps) {
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-[14px] border bg-card transition-[box-shadow,border-color] duration-150 hover:border-ring/40 hover:shadow-[0_8px_24px_-12px_rgb(0_0_0/0.18)]">
       <div className="relative aspect-4/3 border-b bg-muted">
@@ -84,9 +87,14 @@ export function BikeCard({ bike, perHourLabel, bookedLabel }: BikeCardProps) {
         <div className="flex-1" />
 
         <div className="mt-1 flex items-center justify-between gap-3 border-t pt-3.5">
-          <div className="flex items-baseline gap-1">
-            <span className="text-xl font-semibold tracking-[-0.02em]">{bike.priceLabel}</span>
-            <span className="text-[13px] text-muted-foreground">{perHourLabel}</span>
+          <div className="flex flex-col">
+            <div className="flex items-baseline gap-1">
+              <span className="text-xl font-semibold tracking-[-0.02em]">{bike.priceLabel}</span>
+              <span className="text-[13px] text-muted-foreground">{perHourLabel}</span>
+            </div>
+            <span className="text-[13px] text-muted-foreground">
+              {bike.pricePerDayLabel} {perDayLabel}
+            </span>
           </div>
 
           {bike.isAvailable ? (
@@ -96,6 +104,7 @@ export function BikeCard({ bike, perHourLabel, bookedLabel }: BikeCardProps) {
                 id: bike.id,
                 model: bike.model,
                 pricePerHour: bike.price,
+                pricePerDay: bike.pricePerDay,
                 stationName: bike.stationName,
               }}
             />

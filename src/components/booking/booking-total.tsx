@@ -26,10 +26,15 @@ export function BookingTotal({ booking, bike, plate = false }: BookingTotalProps
       )}
     >
       <span className="text-muted-foreground">
-        {t('calculation', {
-          price: formatPrice(bike.pricePerHour, locale),
-          hours: booking.hours,
-        })}
+        {booking.quote.unit === 'day'
+          ? t('calculationDays', {
+              price: formatPrice(bike.pricePerDay, locale),
+              days: booking.quote.units,
+            })
+          : t('calculation', {
+              price: formatPrice(bike.pricePerHour, locale),
+              hours: booking.quote.units,
+            })}
       </span>
       <AnimatedPrice cents={booking.total} className="text-base font-semibold" />
     </div>
