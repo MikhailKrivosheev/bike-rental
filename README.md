@@ -59,6 +59,9 @@ src/
   components/ui/       shadcn/ui components
   components/theme-*   theme provider and light/dark toggle
   components/locale-switcher.tsx
+  components/booking/  booking dialog and animated price
+  hooks/               shared React hooks
+  server/              server actions (booking) and the email stub
   styles/globals.css   Tailwind entry point and theme tokens
   styles/fonts.ts      next/font declarations and their CSS variables
   lib/prisma.ts        Prisma Client singleton
@@ -73,9 +76,16 @@ src/
   `src/i18n/routing.ts` plus a matching `dictionaries/<locale>.json`.
 - Bike descriptions are translated under `BikeDescriptions.<bike id>` and fall back to
   `Bike.description` from the database.
+- Booking flow: pick a date, duration and add-ons in the dialog, then confirm with a
+  6-digit code emailed to the renter. The rental is created as `PENDING` and only becomes
+  `ACTIVE` — marking the bike `RENTED` — once the code is verified.
+- Prices are always recomputed on the server from `Bike.pricePerHour` and
+  `src/lib/rental.ts`; the amount submitted by the client is ignored.
 - Theme is class-based (`next-themes`, `attribute="class"`), light by default, toggled between light and dark only — the system option is disabled.
 - Prices are stored in **cents** (`Int`) and rendered with `formatPrice`.
 - Pages that read the database are marked `export const dynamic = 'force-dynamic'`.
 - Add shadcn components with `pnpm dlx shadcn@latest add <name>`.
 - The theme comes from shadcn preset `b5F1CoTVeS`; re-apply with `pnpm dlx shadcn@latest apply --preset b5F1CoTVeS`.
+- Not wired up yet: OTP delivery (planned via Resend, codes are logged by
+  `src/server/email.ts` in the meantime) and MBWay payment.
 - Fonts: Roboto (`--font-sans`), Noto Serif (`--font-heading`), Geist Mono (`--font-geist-mono`).

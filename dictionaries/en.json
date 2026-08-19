@@ -39,12 +39,53 @@
     "address": "Address",
     "price": "Price",
     "perHour": "/ hour",
-    "rent": "Rent this bike",
     "notFound": "Bike not found"
   },
   "BikeDescriptions": {
     "gravel": "A fast, forgiving gravel bike for mixed surfaces — wide tyres, relaxed geometry and mounts for everything you need on a long day out.",
     "mtb": "A hardtail mountain bike built for trails and singletrack: air fork, hydraulic disc brakes and grippy 29\" tyres.",
     "urban": "A women's step-through city bike with an upright riding position, fenders and a rack — perfect for commuting and relaxed rides."
+  },
+  "Booking": {
+    "trigger": "Book",
+    "title": "Book {model}",
+    "date": "Date",
+    "pickDate": "Pick a date",
+    "pickupNote": "Pickup at {hour}:00 at {station}.",
+    "duration": "Duration",
+    "durationOption": "{hours, plural, one {# hour} other {# hours}}",
+    "accessories": "Add-ons",
+    "accessory": {
+      "helmet": "Helmet",
+      "bottle": "Water bottle"
+    },
+    "total": "Total",
+    "continue": "Continue",
+    "back": "Back",
+    "emailTitle": "Confirm your booking",
+    "emailDescription": "We'll email you a 6-digit code to confirm the booking.",
+    "emailLabel": "Email",
+    "sendCode": "Send code",
+    "sending": "Sending…",
+    "otpTitle": "Enter the code",
+    "otpDescription": "We sent a 6-digit code to {email}.",
+    "confirm": "Confirm booking",
+    "confirming": "Confirming…",
+    "successTitle": "Booked!",
+    "successDescription": "{model} is yours until {until}. Pay with MBWay when you pick it up.",
+    "close": "Close",
+    "unavailable": "Booked",
+    "availableFrom": "Available again {date}",
+    "errors": {
+      "invalidInput": "Please check the booking details and try again.",
+      "pastDate": "Pick a date in the future.",
+      "bikeNotFound": "This bike no longer exists.",
+      "bikeUnavailable": "This bike has just been booked by someone else.",
+      "bookingNotFound": "We couldn't find this booking.",
+      "codeExpired": "The code has expired. Start the booking again.",
+      "tooManyAttempts": "Too many attempts. Start the booking again.",
+      "wrongCode": "That code is not right.",
+      "unexpected": "Something went wrong. Please try again."
+    }
   }
 }

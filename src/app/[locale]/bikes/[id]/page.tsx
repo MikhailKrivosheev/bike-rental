@@ -1,11 +1,13 @@
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
+import { BookingDialog } from '@/components/booking/booking-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { BikeStatus, RentalStatus } from '@/generated/prisma/enums';
 import { Link } from '@/i18n/navigation';
 import { formatPrice } from '@/lib/format';
 import { prisma } from '@/lib/prisma';
@@ -15,17 +17,26 @@ export const dynamic = 'force-dynamic';
 export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[id]'>) {
   const { id } = await params;
 
-  const [locale, t, tType, tStatus, tDescription] = await Promise.all([
+  const [locale, format, t, tType, tStatus, tDescription, tBooking] = await Promise.all([
     getLocale(),
+    getFormatter(),
     getTranslations('BikeDetail'),
     getTranslations('BikeType'),
     getTranslations('BikeStatus'),
     getTranslations('BikeDescriptions'),
+    getTranslations('Booking'),
   ]);
 
   const bike = await prisma.bike.findUnique({
     where: { id },
-    include: { station: true },
+    include: {
+      station: true,
+      rentals: {
+        where: { status: RentalStatus.ACTIVE },
+        orderBy: { endsAt: 'desc' },
+        take: 1,
+      },
+    },
   });
 
   if (!bike) {
@@ -34,6 +45,8 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
 
   // Descriptions live in the message catalogue so they can be translated;
   // anything not translated yet falls back to the value stored in the database.
+  const freesUpAt = bike.rentals.at(0)?.endsAt;
+
   const description = tDescription.has(bike.id)
     ? tDescription(bike.id)
     : (bike.description ?? t('noDescription'));
@@ -83,7 +96,25 @@ export default async function BikePage({ params }: PageProps<'/[locale]/bikes/[i
               </dd>
             </div>
           </dl>
-          <Button className="w-full">{t('rent')}</Button>
+          {bike.status === BikeStatus.AVAILABLE ? (
+            <BookingDialog
+              className="w-full"
+              bike={{
+                id: bike.id,
+                model: bike.model,
+                pricePerHour: bike.pricePerHour,
+                stationName: bike.station?.name ?? '—',
+              }}
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {freesUpAt
+                ? tBooking('availableFrom', {
+                    date: format.dateTime(freesUpAt, { dateStyle: 'medium', timeStyle: 'short' }),
+                  })
+                : tBooking('unavailable')}
+            </p>
+          )}
         </CardContent>
       </Card>
     </main>

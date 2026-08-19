@@ -71,21 +71,44 @@ model Bike {
 }
 
 model Rental {
-  id         String       @id @default(cuid())
-  userId     String
-  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bikeId     String
-  bike       Bike         @relation(fields: [bikeId], references: [id], onDelete: Restrict)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bikeId String
+  bike   Bike   @relation(fields: [bikeId], references: [id], onDelete: Restrict)
+
   status     RentalStatus @default(PENDING)
   startsAt   DateTime
   endsAt     DateTime
   returnedAt DateTime?
-  /// Total rental price, in cents.
+  /// Ids of the add-ons booked with the bike, see src/lib/accessories.ts.
+  accessories String[]    @default([])
+  /// Total rental price including add-ons, in cents.
   totalPrice Int
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+
+  verification VerificationCode?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([bikeId])
   @@index([status])
+}
+
+/// One-time code emailed to the renter to confirm a pending rental.
+model VerificationCode {
+  id       String @id @default(cuid())
+  rentalId String @unique
+  rental   Rental @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+
+  /// SHA-256 hash of the code — the plain code is never stored.
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
 }

@@ -39,12 +39,53 @@
     "address": "Morada",
     "price": "Preço",
     "perHour": "/ hora",
-    "rent": "Alugar esta bicicleta",
     "notFound": "Bicicleta não encontrada"
   },
   "BikeDescriptions": {
     "gravel": "Uma bicicleta de gravel rápida e tolerante para pisos mistos — pneus largos, geometria descontraída e suportes para tudo o que precisa num dia longo.",
     "mtb": "Uma BTT hardtail feita para trilhos e singletrack: forqueta de ar, travões de disco hidráulicos e pneus 29\" com muita aderência.",
     "urban": "Uma bicicleta de cidade de quadro baixo para senhora, com posição de condução direita, guarda-lamas e porta-bagagens — ideal para o dia a dia e passeios tranquilos."
+  },
+  "Booking": {
+    "trigger": "Reservar",
+    "title": "Reservar {model}",
+    "date": "Data",
+    "pickDate": "Escolha uma data",
+    "pickupNote": "Levantamento às {hour}:00 em {station}.",
+    "duration": "Duração",
+    "durationOption": "{hours, plural, one {# hora} other {# horas}}",
+    "accessories": "Extras",
+    "accessory": {
+      "helmet": "Capacete",
+      "bottle": "Garrafa de água"
+    },
+    "total": "Total",
+    "continue": "Continuar",
+    "back": "Voltar",
+    "emailTitle": "Confirme a sua reserva",
+    "emailDescription": "Enviamos-lhe um código de 6 dígitos por email para confirmar a reserva.",
+    "emailLabel": "Email",
+    "sendCode": "Enviar código",
+    "sending": "A enviar…",
+    "otpTitle": "Introduza o código",
+    "otpDescription": "Enviámos um código de 6 dígitos para {email}.",
+    "confirm": "Confirmar reserva",
+    "confirming": "A confirmar…",
+    "successTitle": "Reservada!",
+    "successDescription": "A {model} é sua até {until}. Pague com MBWay no levantamento.",
+    "close": "Fechar",
+    "unavailable": "Reservada",
+    "availableFrom": "Disponível novamente {date}",
+    "errors": {
+      "invalidInput": "Verifique os dados da reserva e tente novamente.",
+      "pastDate": "Escolha uma data futura.",
+      "bikeNotFound": "Esta bicicleta já não existe.",
+      "bikeUnavailable": "Esta bicicleta acabou de ser reservada por outra pessoa.",
+      "bookingNotFound": "Não encontrámos esta reserva.",
+      "codeExpired": "O código expirou. Comece a reserva de novo.",
+      "tooManyAttempts": "Demasiadas tentativas. Comece a reserva de novo.",
+      "wrongCode": "Esse código não está correto.",
+      "unexpected": "Algo correu mal. Tente novamente."
+    }
   }
 }
