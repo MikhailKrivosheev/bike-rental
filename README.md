@@ -71,7 +71,7 @@ src/
   `src/i18n/routing.ts` plus a matching `messages/<locale>.json`.
 - Bike descriptions are translated under `BikeDescriptions.<bike id>` and fall back to
   `Bike.description` from the database.
-- Theme is class-based (`next-themes`, `attribute="class"`), default `system`.
+- Theme is class-based (`next-themes`, `attribute="class"`), light by default, toggled between light and dark only — the system option is disabled.
 - Prices are stored in **cents** (`Int`) and rendered with `formatPrice`.
 - Pages that read the database are marked `export const dynamic = 'force-dynamic'`.
 - Add shadcn components with `pnpm dlx shadcn@latest add <name>`.

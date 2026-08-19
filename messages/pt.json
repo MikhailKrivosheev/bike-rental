@@ -7,11 +7,6 @@
     "brand": "Aluguer de Bicicletas",
     "bikes": "Bicicletas",
     "toggleTheme": "Alternar tema",
-    "theme": {
-      "light": "Claro",
-      "dark": "Escuro",
-      "system": "Sistema"
-    },
     "language": "Idioma"
   },
   "Footer": {

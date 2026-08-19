@@ -65,7 +65,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       )}
     >
       <body className="min-h-full flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <NextIntlClientProvider>
             <SiteHeader />
             {children}

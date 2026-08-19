@@ -7,11 +7,6 @@
     "brand": "Bike Rental",
     "bikes": "Bikes",
     "toggleTheme": "Toggle theme",
-    "theme": {
-      "light": "Light",
-      "dark": "Dark",
-      "system": "System"
-    },
     "language": "Language"
   },
   "Footer": {
