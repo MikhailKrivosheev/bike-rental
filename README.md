@@ -6,7 +6,7 @@
 
 - **Next.js 16** (App Router, Turbopack) + **React 19**
 - **TypeScript 5**
-- **Tailwind CSS 4** + **shadcn/ui** (radix base, preset nova)
+- **Tailwind CSS 4** + **shadcn/ui** (стиль `radix-nova`, тема `mist`, иконки Remix Icon)
 - Бэкенд — Route Handlers / Server Components внутри Next.js (Node.js runtime)
 - **Prisma 7** + **PostgreSQL 18** (драйвер-адаптер `@prisma/adapter-pg`)
 - **pnpm** как пакетный менеджер, Node.js 24 (см. `.nvmrc`)
@@ -61,3 +61,5 @@ src/
 - Цены хранятся в **копейках** (`Int`), форматируются через `formatPrice`.
 - Страницы, читающие БД, помечены `export const dynamic = 'force-dynamic'`.
 - Компоненты shadcn добавляются через `pnpm dlx shadcn@latest add <name>`.
+- Тема задана пресетом shadcn `b5F1CoTVeS`; переприменить целиком — `pnpm dlx shadcn@latest apply --preset b5F1CoTVeS`.
+- Шрифты: Roboto (`--font-sans`), Noto Serif (`--font-heading`), Geist Mono (`--font-geist-mono`), все с кириллическим сабсетом.
