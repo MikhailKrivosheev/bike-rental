@@ -1,0 +1,55 @@
+{
+  "Metadata": {
+    "title": "Aluguer de Bicicletas",
+    "description": "Alugue uma bicicleta à hora"
+  },
+  "Header": {
+    "brand": "Aluguer de Bicicletas",
+    "bikes": "Bicicletas",
+    "toggleTheme": "Alternar tema",
+    "theme": {
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    },
+    "language": "Idioma"
+  },
+  "Footer": {
+    "copyright": "© {year} Aluguer de Bicicletas",
+    "tagline": "Boa viagem. Capacete incluído."
+  },
+  "Catalogue": {
+    "title": "Alugue uma bicicleta",
+    "subtitle": "Escolha uma bicicleta e levante-a na estação mais próxima.",
+    "emptyTitle": "O catálogo está vazio",
+    "emptyDescription": "Arranque a base de dados (pnpm db:up), aplique as migrações (pnpm db:migrate) e carregue os dados de exemplo (pnpm db:seed).",
+    "noStation": "Sem estação",
+    "perHour": "/ hora"
+  },
+  "BikeType": {
+    "GRAVEL": "Gravel",
+    "MTB": "Montanha",
+    "CITY": "Cidade"
+  },
+  "BikeStatus": {
+    "AVAILABLE": "Disponível",
+    "RENTED": "Alugada",
+    "MAINTENANCE": "Manutenção",
+    "RETIRED": "Retirada"
+  },
+  "BikeDetail": {
+    "back": "Voltar ao catálogo",
+    "noDescription": "Ainda sem descrição.",
+    "station": "Estação",
+    "address": "Morada",
+    "price": "Preço",
+    "perHour": "/ hora",
+    "rent": "Alugar esta bicicleta",
+    "notFound": "Bicicleta não encontrada"
+  },
+  "BikeDescriptions": {
+    "gravel": "Uma bicicleta de gravel rápida e tolerante para pisos mistos — pneus largos, geometria descontraída e suportes para tudo o que precisa num dia longo.",
+    "mtb": "Uma BTT hardtail feita para trilhos e singletrack: forqueta de ar, travões de disco hidráulicos e pneus 29\" com muita aderência.",
+    "urban": "Uma bicicleta de cidade de quadro baixo para senhora, com posição de condução direita, guarda-lamas e porta-bagagens — ideal para o dia a dia e passeios tranquilos."
+  }
+}

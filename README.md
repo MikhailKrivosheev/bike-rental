@@ -9,6 +9,7 @@ Bike rental service.
 - **Tailwind CSS 4** + **shadcn/ui** (`radix-nova` style, `mist` base color, Remix Icon)
 - Backend — Route Handlers / Server Components inside Next.js (Node.js runtime)
 - **Prisma 7** + **PostgreSQL 18** (via the `@prisma/adapter-pg` driver adapter)
+- **next-intl** for translations (English + Portuguese), **next-themes** for light/dark mode
 - **pnpm** as the package manager, Node.js 24 (see `.nvmrc`)
 
 ## Getting started
@@ -42,26 +43,35 @@ pnpm dev             # http://localhost:3000
 ## Project layout
 
 ```
+messages/              en.json, pt.json — translation catalogues
 prisma/
   schema.prisma        models: User, Station, Bike, Rental
   migrations/          migrations
   seed.ts              sample data (3 bikes: gravel, MTB, city)
 public/Images/Bikes/   bike photos
 src/
-  app/                 App Router routes
-    api/bikes/         catalogue REST endpoint
-    bikes/[id]/        bike detail page
+  middleware.ts        next-intl locale negotiation and redirects
+  i18n/                routing, navigation helpers, request config
+  app/
+    [locale]/          localised pages (catalogue, bikes/[id])
+    api/bikes/         catalogue REST endpoint (not localised)
   components/layout/   site header and footer
   components/ui/       shadcn/ui components
+  components/theme-*   theme provider and light/dark toggle
+  components/locale-switcher.tsx
   lib/prisma.ts        Prisma Client singleton
-  lib/format.ts        price formatting
-  lib/bikes.ts         bike type labels
+  lib/format.ts        locale-aware price formatting
   generated/prisma/    generated Prisma Client (not committed)
 ```
 
 ## Conventions
 
-- The app is English-only: UI copy, seed data and code comments.
+- Code, comments and message keys are English; user-facing copy lives in `messages/*.json`.
+- Locales are prefixed (`/en`, `/pt`); `/` redirects to the negotiated locale. Add a locale in
+  `src/i18n/routing.ts` plus a matching `messages/<locale>.json`.
+- Bike descriptions are translated under `BikeDescriptions.<bike id>` and fall back to
+  `Bike.description` from the database.
+- Theme is class-based (`next-themes`, `attribute="class"`), default `system`.
 - Prices are stored in **cents** (`Int`) and rendered with `formatPrice`.
 - Pages that read the database are marked `export const dynamic = 'force-dynamic'`.
 - Add shadcn components with `pnpm dlx shadcn@latest add <name>`.

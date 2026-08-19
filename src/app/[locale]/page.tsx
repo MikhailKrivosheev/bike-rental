@@ -1,5 +1,5 @@
+import { getLocale, getTranslations } from 'next-intl/server';
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import {
@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { BikeStatus } from '@/generated/prisma/enums';
-import { bikeTypeLabels } from '@/lib/bikes';
+import { Link } from '@/i18n/navigation';
 import { formatPrice } from '@/lib/format';
 import { prisma } from '@/lib/prisma';
 
@@ -18,6 +18,12 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
+  const [locale, t, tType] = await Promise.all([
+    getLocale(),
+    getTranslations('Catalogue'),
+    getTranslations('BikeType'),
+  ]);
+
   const bikes = await prisma.bike.findMany({
     where: { status: BikeStatus.AVAILABLE },
     include: { station: true },
@@ -27,20 +33,15 @@ export default async function Home() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14">
       <header className="mb-10 flex flex-col gap-2">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">Rent a bike</h1>
-        <p className="text-muted-foreground">
-          Pick a bike and collect it at the nearest station.
-        </p>
+        <h1 className="font-heading text-3xl font-semibold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </header>
 
       {bikes.length === 0 ? (
         <Card>
           <CardHeader>
-            <CardTitle>The catalogue is empty</CardTitle>
-            <CardDescription>
-              Start the database (<code>pnpm db:up</code>), apply migrations (
-              <code>pnpm db:migrate</code>) and load sample data (<code>pnpm db:seed</code>).
-            </CardDescription>
+            <CardTitle>{t('emptyTitle')}</CardTitle>
+            <CardDescription>{t('emptyDescription')}</CardDescription>
           </CardHeader>
         </Card>
       ) : (
@@ -63,17 +64,17 @@ export default async function Home() {
                       />
                     ) : null}
                     <Badge className="absolute top-3 left-3" variant="secondary">
-                      {bikeTypeLabels[bike.type]}
+                      {tType(bike.type)}
                     </Badge>
                   </div>
                   <CardHeader>
                     <CardTitle>{bike.model}</CardTitle>
-                    <CardDescription>{bike.station?.name ?? 'No station'}</CardDescription>
+                    <CardDescription>{bike.station?.name ?? t('noStation')}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <span className="text-lg font-medium">
-                      {formatPrice(bike.pricePerHour)}
-                      <span className="text-sm text-muted-foreground"> / hour</span>
+                      {formatPrice(bike.pricePerHour, locale)}
+                      <span className="text-sm text-muted-foreground"> {t('perHour')}</span>
                     </span>
                   </CardContent>
                 </Card>

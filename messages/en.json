@@ -1,0 +1,55 @@
+{
+  "Metadata": {
+    "title": "Bike Rental",
+    "description": "Rent a bike by the hour"
+  },
+  "Header": {
+    "brand": "Bike Rental",
+    "bikes": "Bikes",
+    "toggleTheme": "Toggle theme",
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": "Language"
+  },
+  "Footer": {
+    "copyright": "© {year} Bike Rental",
+    "tagline": "Ride safe. Helmets included."
+  },
+  "Catalogue": {
+    "title": "Rent a bike",
+    "subtitle": "Pick a bike and collect it at the nearest station.",
+    "emptyTitle": "The catalogue is empty",
+    "emptyDescription": "Start the database (pnpm db:up), apply migrations (pnpm db:migrate) and load sample data (pnpm db:seed).",
+    "noStation": "No station",
+    "perHour": "/ hour"
+  },
+  "BikeType": {
+    "GRAVEL": "Gravel",
+    "MTB": "Mountain",
+    "CITY": "City"
+  },
+  "BikeStatus": {
+    "AVAILABLE": "Available",
+    "RENTED": "Rented",
+    "MAINTENANCE": "Maintenance",
+    "RETIRED": "Retired"
+  },
+  "BikeDetail": {
+    "back": "Back to catalogue",
+    "noDescription": "No description yet.",
+    "station": "Station",
+    "address": "Address",
+    "price": "Price",
+    "perHour": "/ hour",
+    "rent": "Rent this bike",
+    "notFound": "Bike not found"
+  },
+  "BikeDescriptions": {
+    "gravel": "A fast, forgiving gravel bike for mixed surfaces — wide tyres, relaxed geometry and mounts for everything you need on a long day out.",
+    "mtb": "A hardtail mountain bike built for trails and singletrack: air fork, hydraulic disc brakes and grippy 29\" tyres.",
+    "urban": "A women's step-through city bike with an upright riding position, fenders and a rack — perfect for commuting and relaxed rides."
+  }
+}
