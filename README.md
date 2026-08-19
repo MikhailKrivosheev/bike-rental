@@ -101,4 +101,7 @@ language or theme switcher, no add-ons and no confirmation step: those stay as b
 - The theme comes from shadcn preset `b5F1CoTVeS`; re-apply with `pnpm dlx shadcn@latest apply --preset b5F1CoTVeS`.
 - Not wired up yet: OTP delivery (planned via Resend, codes are logged by
   `src/server/email.ts` in the meantime) and MBWay payment.
+- While delivery is stubbed, the code **111111** is accepted as well. It works in `pnpm dev`
+  and, in production builds, only when `ALLOW_DEV_OTP=true` — drop both the constant in
+  `src/server/booking.ts` and the env var once real emails go out.
 - Fonts: Geist (`--font-sans`, `--font-heading`) and Geist Mono (`--font-geist-mono`), per the design handoff.

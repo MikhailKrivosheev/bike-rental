@@ -23,6 +23,17 @@ const CODE_LENGTH = 6;
 const CODE_TTL_MINUTES = 10;
 const MAX_ATTEMPTS = 5;
 
+/**
+ * Temporary test bypass until Resend delivers the real codes. It is refused in
+ * production builds unless ALLOW_DEV_OTP is explicitly set, so it can never
+ * quietly reach a deployed environment.
+ */
+const DEV_CODE = '111111';
+
+function devCodeAllowed() {
+  return process.env.NODE_ENV !== 'production' || process.env.ALLOW_DEV_OTP === 'true';
+}
+
 export type BookingResult =
   | { ok: true; rentalId: string }
   | { ok: false; error: string };
@@ -151,7 +162,11 @@ export async function confirmBooking(rentalId: string, code: string): Promise<Ve
     return { ok: false, error: t('tooManyAttempts') };
   }
 
-  if (verification.codeHash !== hashCode(code.trim())) {
+  const submitted = code.trim();
+  const accepted =
+    verification.codeHash === hashCode(submitted) || (devCodeAllowed() && submitted === DEV_CODE);
+
+  if (!accepted) {
     await prisma.verificationCode.update({
       where: { id: verification.id },
       data: { attempts: { increment: 1 } },
