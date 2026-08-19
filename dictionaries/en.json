@@ -10,7 +10,10 @@
     "howItWorks": "How it works",
     "pickupPoints": "Pickup points",
     "toggleTheme": "Toggle theme",
-    "language": "Language"
+    "language": "Language",
+    "myBookings": "My bookings",
+    "signIn": "Sign in",
+    "comingSoon": "Accounts are coming soon."
   },
   "Footer": {
     "about": "Bikes by the hour, all over the city. Open every day from 8:00 to 23:00.",

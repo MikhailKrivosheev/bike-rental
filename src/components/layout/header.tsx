@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
+import { AuthButtons } from '@/components/layout/auth-buttons';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Link } from '@/i18n/navigation';
@@ -34,6 +35,7 @@ export async function Header() {
         <div className="flex flex-1 items-center justify-end gap-1">
           <LocaleSwitcher />
           <ThemeToggle />
+          <AuthButtons />
         </div>
       </div>
     </header>

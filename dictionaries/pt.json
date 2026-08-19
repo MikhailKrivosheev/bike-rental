@@ -10,7 +10,10 @@
     "howItWorks": "Como funciona",
     "pickupPoints": "Pontos de levantamento",
     "toggleTheme": "Alternar tema",
-    "language": "Idioma"
+    "language": "Idioma",
+    "myBookings": "As minhas reservas",
+    "signIn": "Entrar",
+    "comingSoon": "As contas estão a caminho."
   },
   "Footer": {
     "about": "Bicicletas à hora, por toda a cidade. Aberto todos os dias das 8:00 às 23:00.",
