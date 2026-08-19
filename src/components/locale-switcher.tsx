@@ -2,7 +2,7 @@
 
 import { RiGlobalLine } from '@remixicon/react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useTransition } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -11,21 +11,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { usePathname, useRouter } from '@/i18n/navigation';
+import { getPathname, usePathname } from '@/i18n/navigation';
 import { localeLabels, locales, type Locale } from '@/i18n/routing';
 
 export function LocaleSwitcher() {
   const t = useTranslations('Header');
   const activeLocale = useLocale();
-  const router = useRouter();
   const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
 
   function selectLocale(locale: Locale) {
-    startTransition(() => {
-      // `pathname` is locale-agnostic here, so the same page opens in the new locale.
-      router.replace(pathname, { locale });
-    });
+    setIsPending(true);
+
+    // A full navigation rather than router.replace: switching locale swaps the
+    // [locale] segment, and a client-side remount of the root layout would make
+    // React re-render the next-themes bootstrap script (which it never runs).
+    // `pathname` is locale-agnostic here, so the same page opens in the new locale.
+    window.location.assign(getPathname({ href: pathname, locale }));
   }
 
   return (
