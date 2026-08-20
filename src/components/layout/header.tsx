@@ -10,12 +10,6 @@ import { Link } from "@/i18n/navigation";
 export async function Header() {
   const translate = await getTranslations("Header");
 
-  const links = [
-    { href: "/#catalogue", label: translate("catalogue") },
-    { href: "/#how-it-works", label: translate("howItWorks") },
-    { href: "/pickup-points", label: translate("pickupPoints") },
-  ];
-
   return (
     <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
       <Container className="flex h-16 items-center gap-8">
@@ -33,15 +27,21 @@ export async function Header() {
         </Link>
 
         <nav className="hidden gap-6 text-sm text-muted-foreground sm:flex">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+          <Link
+            href="/#catalogue"
+            className="transition-colors hover:text-foreground"
+          >
+            {translate("catalogue")}
+          </Link>
+          <a href="#" className="transition-colors hover:text-foreground">
+            {translate("howItWorks")}
+          </a>
+          <Link
+            href="/pickup-points"
+            className="transition-colors hover:text-foreground"
+          >
+            {translate("pickupPoints")}
+          </Link>
         </nav>
 
         <div className="flex flex-1 items-center justify-end gap-1">

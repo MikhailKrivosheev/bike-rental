@@ -14,7 +14,7 @@ export async function Footer() {
   // Placeholder link targets are intentionally omitted: these pages don't exist yet.
   const columns = [
     {
-      id: "how-it-works",
+      id: "service",
       title: translate("service"),
       items: translate.raw("serviceItems") as string[],
     },
