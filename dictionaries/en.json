@@ -1,10 +1,10 @@
 {
   "Metadata": {
-    "title": "Bike Rental",
+    "title": "Bike Nomad",
     "description": "Rent a bike by the hour"
   },
   "Header": {
-    "brand": "Bike Rental",
+    "brand": "Bike Nomad",
     "brandInitial": "B",
     "catalogue": "Catalogue",
     "howItWorks": "How it works",
@@ -53,7 +53,7 @@
       "help@bikerental.example",
       "Live chat"
     ],
-    "copyright": "© {year} Bike Rental",
+    "copyright": "© {year} Bike Nomad",
     "legal": "Terms of service · Privacy policy"
   },
   "Catalogue": {

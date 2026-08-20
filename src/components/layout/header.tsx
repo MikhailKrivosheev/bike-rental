@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 import { AuthButtons } from "Components/layout/auth-buttons";
@@ -19,9 +20,13 @@ export async function Header() {
     <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
       <Container className="flex h-16 items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
-            {translate("brandInitial")}
-          </span>
+          <Image
+            src="/Images/logo.webp"
+            alt=""
+            width={64}
+            height={64}
+            className="size-16 rounded-lg object-cover"
+          />
           <span className="text-[15px] font-semibold tracking-[-0.01em]">
             {translate("brand")}
           </span>
