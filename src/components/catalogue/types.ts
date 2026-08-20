@@ -22,7 +22,7 @@ export type CardProps = {
   perHourLabel: string;
   perDayLabel: string;
   bookedLabel: string;
-  isSignedIn: boolean;
+  userEmail: string | null;
   className?: string;
   style?: CSSProperties;
 };
@@ -35,5 +35,5 @@ export type Filter = {
 export type GridProps = {
   bikes: CardModel[];
   filters: Filter[];
-  isSignedIn: boolean;
+  userEmail: string | null;
 };

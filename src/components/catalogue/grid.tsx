@@ -8,7 +8,7 @@ import { ALL_TYPES, FILTER_BUTTON_CLASS } from 'Components/catalogue/constants';
 import type { GridProps } from 'Components/catalogue/types';
 import { Button } from 'Components/ui/button';
 
-export function Grid({ bikes, filters, isSignedIn }: GridProps) {
+export function Grid({ bikes, filters, userEmail }: GridProps) {
   const translate = useTranslations('Catalogue');
   const [active, setActive] = useState(ALL_TYPES);
 
@@ -54,7 +54,7 @@ export function Grid({ bikes, filters, isSignedIn }: GridProps) {
               perHourLabel={translate('perHour')}
               perDayLabel={translate('perDay')}
               bookedLabel={translate('booked')}
-              isSignedIn={isSignedIn}
+              userEmail={userEmail}
               className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards duration-300 ease-out"
               style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
             />

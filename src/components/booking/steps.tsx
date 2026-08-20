@@ -63,6 +63,15 @@ export function Steps({ booking, bike, onCancel }: StepsProps) {
     );
   }
 
+  if (booking.step === 'confirming') {
+    return (
+      <div className="flex flex-col items-center gap-3 py-12">
+        <span className="size-6 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground" />
+        <p className="text-sm text-muted-foreground">{translate('confirming')}</p>
+      </div>
+    );
+  }
+
   if (booking.step === 'code') {
     return (
       <>

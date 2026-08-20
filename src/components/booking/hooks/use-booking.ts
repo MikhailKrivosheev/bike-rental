@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useMemo, useReducer, useTransition } from "react";
+import { useEffect, useMemo, useReducer, useState, useTransition } from "react";
 import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
@@ -10,11 +10,16 @@ import {
   DEFAULT_HOURS,
   clampHours,
   daysBetween,
+  hourOf,
+  hoursBetween,
+  nextPickupTime,
   pickupTimes,
   quoteRental,
 } from "Lib/rental";
 import type { BookingBike, BookingStep } from "Components/booking/types";
-import { confirmBooking, createBooking, payBooking } from "@/server/booking";
+import { confirmBooking, createBooking, getBikeBookedRanges, payBooking } from "@/server/booking";
+
+export type BookedRange = { start: Date; end: Date };
 
 /** `2026-08-20` in the renter's own timezone, which is what the server expects. */
 function toDateInput(date: Date) {
@@ -27,7 +32,7 @@ type BookingState = {
   step: BookingStep;
   range: DateRange | undefined;
   time: string;
-  hours: number;
+  endTime: string;
   accessories: string[];
   email: string;
   code: string;
@@ -36,11 +41,13 @@ type BookingState = {
 };
 
 function initialState(): BookingState {
+  const time = pickupTimes[2] ?? pickupTimes[0];
+
   return {
     step: "details",
     range: undefined,
-    time: pickupTimes[2] ?? pickupTimes[0],
-    hours: DEFAULT_HOURS,
+    time,
+    endTime: pickupTimes[2 + DEFAULT_HOURS] ?? nextPickupTime(time),
     accessories: [],
     email: "",
     code: "",
@@ -54,11 +61,12 @@ type BookingAction =
   | { type: "setStep"; step: BookingStep }
   | { type: "setRange"; range: DateRange | undefined }
   | { type: "setTime"; time: string }
-  | { type: "setHours"; hours: number }
+  | { type: "setEndTime"; endTime: string }
   | { type: "toggleAccessory"; id: string; checked: boolean }
   | { type: "setEmail"; email: string }
   | { type: "setCode"; code: string }
   | { type: "emailSubmitted"; rentalId: string }
+  | { type: "bookingConfirmed"; rentalId: string; startsAt: Date }
   | { type: "codeConfirmed"; startsAt: Date }
   | { type: "paid" };
 
@@ -70,10 +78,16 @@ function bookingReducer(state: BookingState, action: BookingAction): BookingStat
       return { ...state, step: action.step };
     case "setRange":
       return { ...state, range: action.range };
-    case "setTime":
-      return { ...state, time: action.time };
-    case "setHours":
-      return { ...state, hours: clampHours(action.hours) };
+    case "setTime": {
+      const time = action.time;
+      // Keep the range non-empty when the start slides past the current end.
+      const endTime = hourOf(state.endTime) > hourOf(time) ? state.endTime : nextPickupTime(time);
+      return { ...state, time, endTime };
+    }
+    case "setEndTime":
+      return hourOf(action.endTime) > hourOf(state.time)
+        ? { ...state, endTime: action.endTime }
+        : state;
     case "toggleAccessory":
       return {
         ...state,
@@ -87,6 +101,8 @@ function bookingReducer(state: BookingState, action: BookingAction): BookingStat
       return { ...state, code: action.code };
     case "emailSubmitted":
       return { ...state, rentalId: action.rentalId, step: "code" };
+    case "bookingConfirmed":
+      return { ...state, rentalId: action.rentalId, startsAt: action.startsAt, step: "summary" };
     case "codeConfirmed":
       return { ...state, startsAt: action.startsAt, step: "summary" };
     case "paid":
@@ -94,22 +110,65 @@ function bookingReducer(state: BookingState, action: BookingAction): BookingStat
   }
 }
 
-export function useBooking(bike: BookingBike) {
+export function useBooking(bike: BookingBike, userEmail: string | null = null) {
   const translate = useTranslations("Booking");
   const locale = useLocale();
   const router = useRouter();
 
   const [state, dispatch] = useReducer(bookingReducer, undefined, initialState);
   const [isPending, startTransition] = useTransition();
+  const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([]);
 
-  const { step, range, time, hours, accessories, email, code, rentalId, startsAt } = state;
+  const { step, range, time, endTime, accessories, email, code, rentalId, startsAt } = state;
 
   const days = range?.from && range.to ? daysBetween(range.from, range.to) : 0;
+  const hours = clampHours(hoursBetween(time, endTime));
 
   const quote = useMemo(
     () => quoteRental(bike, { days, hours, accessories }),
     [bike, days, hours, accessories],
   );
+
+  async function refreshAvailability() {
+    const ranges = await getBikeBookedRanges(bike.id);
+    setBookedRanges(ranges.map((range) => ({ start: new Date(range.startsAt), end: new Date(range.endsAt) })));
+  }
+
+  // Bookings made by other visitors while this dialog sits open shouldn't be
+  // shown as free, so this refreshes whenever the flow starts a fresh attempt.
+  useEffect(() => {
+    if (step === "details") {
+      refreshAvailability();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bike.id, step]);
+
+  // A previously picked (or default) start slot can turn out to already be
+  // taken — by another visitor, or by this same bike on a re-opened dialog —
+  // so this nudges the selection to the next free slot instead of leaving an
+  // unbookable time silently selected.
+  useEffect(() => {
+    if (days !== 0 || !range?.from) {
+      return;
+    }
+
+    const day = range.from;
+    const isTaken = (candidateTime: string) => {
+      const candidate = new Date(day);
+      candidate.setHours(hourOf(candidateTime), 0, 0, 0);
+      return bookedRanges.some((booked) => booked.start <= candidate && booked.end > candidate);
+    };
+
+    if (!isTaken(time)) {
+      return;
+    }
+
+    const free = pickupTimes.find((candidateTime) => !isTaken(candidateTime));
+    if (free && free !== time) {
+      dispatch({ type: "setTime", time: free });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookedRanges, range?.from, days]);
 
   function toggleAccessory(id: string, checked: boolean) {
     dispatch({ type: "toggleAccessory", id, checked });
@@ -127,7 +186,7 @@ export function useBooking(bike: BookingBike) {
           date: toDateInput(range.from as Date),
           endDate: days > 0 && range.to ? toDateInput(range.to) : undefined,
           time,
-          hours,
+          endTime,
           accessories,
           email,
         },
@@ -140,6 +199,46 @@ export function useBooking(bike: BookingBike) {
       }
 
       dispatch({ type: "emailSubmitted", rentalId: result.rentalId });
+    });
+  }
+
+  /** Signed-in visitors already proved their email at login, so this skips straight past the email/OTP steps. */
+  function book() {
+    if (!range?.from || !userEmail) {
+      return;
+    }
+
+    dispatch({ type: "setStep", step: "confirming" });
+
+    startTransition(async () => {
+      const result = await createBooking(
+        {
+          bikeId: bike.id,
+          date: toDateInput(range.from as Date),
+          endDate: days > 0 && range.to ? toDateInput(range.to) : undefined,
+          time,
+          endTime,
+          accessories,
+          email: userEmail,
+        },
+        locale,
+      );
+
+      if (!result.ok) {
+        toast.error(result.error);
+        dispatch({ type: "setStep", step: "details" });
+        return;
+      }
+
+      if (result.confirmed) {
+        dispatch({
+          type: "bookingConfirmed",
+          rentalId: result.rentalId,
+          startsAt: new Date(result.startsAt),
+        });
+      } else {
+        dispatch({ type: "emailSubmitted", rentalId: result.rentalId });
+      }
     });
   }
 
@@ -194,8 +293,10 @@ export function useBooking(bike: BookingBike) {
     days,
     time,
     setTime: (value: string) => dispatch({ type: "setTime", time: value }),
+    endTime,
+    setEndTime: (value: string) => dispatch({ type: "setEndTime", endTime: value }),
     hours,
-    setHours: (value: number) => dispatch({ type: "setHours", hours: value }),
+    bookedRanges,
     accessories,
     toggleAccessory,
     email,
@@ -208,6 +309,7 @@ export function useBooking(bike: BookingBike) {
     isPending,
     canContinue: Boolean(range?.from),
     submitEmail,
+    book,
     submitCode,
     pay,
     finish,

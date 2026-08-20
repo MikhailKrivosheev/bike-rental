@@ -126,7 +126,7 @@ export default async function BikePage({
               pricePerDay: bike.pricePerDay,
               stationName: bike.stationName ?? "—",
             }}
-            isSignedIn={Boolean(user)}
+            userEmail={user?.email ?? null}
           />
         ) : (
           <aside className="flex flex-col gap-4 rounded-2xl border p-[22px] lg:sticky lg:top-24">

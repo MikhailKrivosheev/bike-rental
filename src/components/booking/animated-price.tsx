@@ -25,7 +25,6 @@ export function AnimatedPrice({ cents, className }: AnimatedPriceProps) {
   return (
     <span
       className={priceClassName}
-      // The animated digits are noise for assistive tech; announce the final value.
       aria-label={formatPrice(cents, locale)}
     >
       <span aria-hidden>{formatPrice(Math.round(animated), locale)}</span>

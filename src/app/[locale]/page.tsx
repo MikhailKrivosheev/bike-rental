@@ -93,7 +93,7 @@ export default async function Home() {
               value: type,
               label: translateType(type),
             }))}
-            isSignedIn={Boolean(user)}
+            userEmail={user?.email ?? null}
           />
         )}
       </Section>

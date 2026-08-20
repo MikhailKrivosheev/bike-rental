@@ -25,7 +25,7 @@ function resolveLocale(requested: string) {
   return hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 }
 
-async function startSession(userId: string) {
+export async function startSession(userId: string) {
   const store = await cookies();
   store.set(SESSION_COOKIE, createSessionToken(userId), {
     httpOnly: true,

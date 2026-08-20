@@ -8,7 +8,7 @@ export type BookingBike = {
   stationName: string;
 };
 
-export type BookingStep = 'details' | 'email' | 'code' | 'summary' | 'done';
+export type BookingStep = 'details' | 'email' | 'code' | 'confirming' | 'summary' | 'done';
 
 export type Booking = ReturnType<typeof useBooking>;
 
@@ -20,7 +20,8 @@ export type AnimatedPriceProps = {
 export type DialogProps = {
   bike: BookingBike;
   className?: string;
-  isSignedIn: boolean;
+  /** The signed-in visitor's email, or null for a guest — lets the booking flow skip its own email/OTP steps when the session already vouches for the address. */
+  userEmail: string | null;
 };
 
 export type FieldsProps = {
@@ -30,7 +31,8 @@ export type FieldsProps = {
 
 export type PanelProps = {
   bike: BookingBike;
-  isSignedIn: boolean;
+  /** The signed-in visitor's email, or null for a guest — lets the booking flow skip its own email/OTP steps when the session already vouches for the address. */
+  userEmail: string | null;
 };
 
 export type StepsProps = {

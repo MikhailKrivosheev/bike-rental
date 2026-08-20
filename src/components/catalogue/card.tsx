@@ -16,7 +16,7 @@ import { Button } from 'Components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { cn } from 'Lib/utils';
 
-export function Card({ bike, perHourLabel, perDayLabel, bookedLabel, isSignedIn, className, style }: CardProps) {
+export function Card({ bike, perHourLabel, perDayLabel, bookedLabel, userEmail, className, style }: CardProps) {
   const imageClassName = cn(CARD_IMAGE_CLASS, !bike.isAvailable && CARD_IMAGE_BOOKED_CLASS);
 
   const availabilityClassName = cn(
@@ -91,7 +91,7 @@ export function Card({ bike, perHourLabel, perDayLabel, bookedLabel, isSignedIn,
           {bike.isAvailable ? (
             <Dialog
               className="relative z-10 h-9 px-4"
-              isSignedIn={isSignedIn}
+              userEmail={userEmail}
               bike={{
                 id: bike.id,
                 model: bike.model,

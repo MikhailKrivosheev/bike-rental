@@ -9,20 +9,46 @@ import { BikeStatus, RentalStatus } from "@/generated/prisma/enums";
 import { routing } from "@/i18n/routing";
 import {
   MAX_DAYS,
-  MAX_HOURS,
-  MIN_HOURS,
   accessoryIds,
   daysBetween,
+  hoursBetween,
   pickupTimes,
   quoteRental,
 } from "Lib/rental";
 import { CODE_TTL_MINUTES, MAX_ATTEMPTS, codeMatches, generateCode, hashCode } from "Lib/otp";
 import { prisma } from "Lib/prisma";
 import { BIKES_TAG } from "@/server/catalogue";
+import { getCurrentUser, startSession } from "@/server/auth";
 import { sendVerificationCode } from "@/server/email";
 
 export type BookingResult =
-  { ok: true; rentalId: string } | { ok: false; error: string };
+  | { ok: true; rentalId: string; confirmed: false }
+  | { ok: true; rentalId: string; confirmed: true; startsAt: string; endsAt: string }
+  | { ok: false; error: string };
+
+export type BookedRange = { startsAt: string; endsAt: string };
+
+/**
+ * Every future window this bike is already spoken for, so the date/time
+ * pickers can show it instead of letting a visitor pick a slot the server
+ * will just reject at submit time.
+ */
+export async function getBikeBookedRanges(bikeId: string): Promise<BookedRange[]> {
+  const rentals = await prisma.rental.findMany({
+    where: {
+      bikeId,
+      status: { in: [RentalStatus.PENDING, RentalStatus.ACTIVE] },
+      endsAt: { gt: new Date() },
+    },
+    select: { startsAt: true, endsAt: true },
+    orderBy: { startsAt: "asc" },
+  });
+
+  return rentals.map((rental) => ({
+    startsAt: rental.startsAt.toISOString(),
+    endsAt: rental.endsAt.toISOString(),
+  }));
+}
 
 export type VerificationResult =
   { ok: true; startsAt: string; endsAt: string } | { ok: false; error: string };
@@ -32,11 +58,11 @@ const bookingSchema = z.object({
   date: z.iso.date(),
   endDate: z.iso.date().optional(),
   time: z.enum(pickupTimes as [string, ...string[]]),
-  hours: z.number().int().min(MIN_HOURS).max(MAX_HOURS),
+  endTime: z.enum(pickupTimes as [string, ...string[]]),
   accessories: z
     .array(z.enum(accessoryIds as [string, ...string[]]))
     .default([]),
-  email: z.email(),
+  email: z.email().optional(),
 });
 
 export type BookingInput = z.input<typeof bookingSchema>;
@@ -67,8 +93,17 @@ export async function createBooking(
     return { ok: false, error: translateError("invalidInput") };
   }
 
-  const { bikeId, date, endDate, time, hours, accessories, email } =
+  const { bikeId, date, endDate, time, endTime, accessories, email } =
     parsed.data;
+
+  // A signed-in visitor has already proven their email once at login, so the
+  // session — not the client-supplied field — is the source of truth for who
+  // this booking belongs to.
+  const sessionUser = await getCurrentUser();
+
+  if (!sessionUser && !email) {
+    return { ok: false, error: translateError("invalidInput") };
+  }
 
   const startsAt = atTime(date, time);
   const days = endDate ? daysBetween(startsAt, atTime(endDate, time)) : 0;
@@ -77,10 +112,11 @@ export async function createBooking(
     return { ok: false, error: translateError("invalidInput") };
   }
 
-  const endsAt =
-    days > 0
-      ? atTime(endDate as string, time)
-      : new Date(startsAt.getTime() + hours * 60 * 60 * 1000);
+  const endsAt = days > 0 ? atTime(endDate as string, endTime) : atTime(date, endTime);
+
+  if (endsAt <= startsAt) {
+    return { ok: false, error: translateError("invalidInput") };
+  }
 
   if (endsAt <= new Date()) {
     return { ok: false, error: translateError("pastDate") };
@@ -113,13 +149,38 @@ export async function createBooking(
     return { ok: false, error: translateError("bikeUnavailable") };
   }
 
+  const hours = hoursBetween(time, endTime);
   const { total: totalPrice } = quoteRental(bike, { days, hours, accessories });
 
-  const user = await prisma.user.upsert({
-    where: { email },
-    update: {},
-    create: { email, name: email.split("@")[0] },
-  });
+  const user =
+    sessionUser ??
+    (await prisma.user.upsert({
+      where: { email: email as string },
+      update: {},
+      create: { email: email as string, name: (email as string).split("@")[0] },
+    }));
+
+  if (sessionUser) {
+    const rental = await prisma.rental.create({
+      data: {
+        userId: user.id,
+        bikeId: bike.id,
+        status: RentalStatus.PENDING,
+        startsAt,
+        endsAt,
+        accessories,
+        totalPrice,
+      },
+    });
+
+    return {
+      ok: true,
+      rentalId: rental.id,
+      confirmed: true,
+      startsAt: startsAt.toISOString(),
+      endsAt: endsAt.toISOString(),
+    };
+  }
 
   const code = generateCode();
 
@@ -141,9 +202,9 @@ export async function createBooking(
     },
   });
 
-  await sendVerificationCode({ to: email, code, bikeModel: bike.model });
+  await sendVerificationCode({ to: user.email, code, bikeModel: bike.model });
 
-  return { ok: true, rentalId: rental.id };
+  return { ok: true, rentalId: rental.id, confirmed: false };
 }
 
 export async function confirmBooking(
@@ -193,6 +254,8 @@ export async function confirmBooking(
     where: { id: verification.id },
     data: { consumedAt: new Date() },
   });
+
+  await startSession(rental.userId);
 
   return {
     ok: true,
@@ -245,10 +308,13 @@ export async function payBooking(
     include: { verification: true },
   });
 
-  if (
-    !rental?.verification?.consumedAt ||
-    rental.status !== RentalStatus.PENDING
-  ) {
+  if (!rental || rental.status !== RentalStatus.PENDING) {
+    return { ok: false, error: translateError("bookingNotFound") };
+  }
+
+  // A rental created for a signed-in visitor has no VerificationCode at all —
+  // the session already proved the email, so there was nothing to consume.
+  if (rental.verification && !rental.verification.consumedAt) {
     return { ok: false, error: translateError("bookingNotFound") };
   }
 

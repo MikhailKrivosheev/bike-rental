@@ -39,6 +39,21 @@ export function clampHours(hours: number) {
   return Math.min(MAX_HOURS, Math.max(MIN_HOURS, Math.round(hours)));
 }
 
+/** `"14:00"` → `14`. Pickup times are always `HH:00`, so this is safe. */
+export function hourOf(time: string) {
+  return Number(time.slice(0, 2));
+}
+
+export function hoursBetween(startTime: string, endTime: string) {
+  return hourOf(endTime) - hourOf(startTime);
+}
+
+/** The next pickup slot after `time`, or the last one if `time` is already the last. */
+export function nextPickupTime(time: string) {
+  const index = pickupTimes.indexOf(time);
+  return pickupTimes[Math.min(index + 1, pickupTimes.length - 1)] ?? time;
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
