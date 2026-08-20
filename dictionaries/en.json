@@ -143,6 +143,7 @@
     "time": "Start time",
     "endTime": "End time",
     "slotTaken": "taken",
+    "slotPast": "past",
     "hours": "{hours, plural, one {# hour} other {# hours}}",
     "pickupPoint": "Pickup point",
     "calculation": "{price} × {hours, plural, one {# hour} other {# hours}}",

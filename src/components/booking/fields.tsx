@@ -75,6 +75,14 @@ export function Fields({ booking, bike }: FieldsProps) {
     return booking.bookedRanges.some((range) => range.start < dayEnd && range.end > dayStart);
   }
 
+  /** Whether the given pickup instant on the current start day has already passed. */
+  function isTimePast(time: string) {
+    if (!from || from.getTime() !== today.getTime()) {
+      return false;
+    }
+    return atLocalHour(from, time) <= new Date();
+  }
+
   /** Whether the given pickup instant on the current start day already belongs to a booked rental. */
   function isTimeTaken(time: string) {
     if (!from) {
@@ -141,9 +149,14 @@ export function Fields({ booking, bike }: FieldsProps) {
             </SelectTrigger>
             <SelectContent>
               {pickupTimes.map((value) => (
-                <SelectItem key={value} value={value} disabled={booking.days === 0 && isTimeTaken(value)}>
+                <SelectItem
+                  key={value}
+                  value={value}
+                  disabled={(booking.days === 0 && isTimeTaken(value)) || isTimePast(value)}
+                >
                   {value}
                   {booking.days === 0 && isTimeTaken(value) ? ` — ${translate('slotTaken')}` : ''}
+                  {isTimePast(value) ? ` — ${translate('slotPast')}` : ''}
                 </SelectItem>
               ))}
             </SelectContent>

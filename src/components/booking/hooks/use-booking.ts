@@ -153,17 +153,26 @@ export function useBooking(bike: BookingBike, userEmail: string | null = null) {
     }
 
     const day = range.from;
+    const isToday = day.toDateString() === new Date().toDateString();
     const isTaken = (candidateTime: string) => {
       const candidate = new Date(day);
       candidate.setHours(hourOf(candidateTime), 0, 0, 0);
       return bookedRanges.some((booked) => booked.start <= candidate && booked.end > candidate);
     };
+    const isPast = (candidateTime: string) => {
+      if (!isToday) {
+        return false;
+      }
+      const candidate = new Date(day);
+      candidate.setHours(hourOf(candidateTime), 0, 0, 0);
+      return candidate <= new Date();
+    };
 
-    if (!isTaken(time)) {
+    if (!isTaken(time) && !isPast(time)) {
       return;
     }
 
-    const free = pickupTimes.find((candidateTime) => !isTaken(candidateTime));
+    const free = pickupTimes.find((candidateTime) => !isTaken(candidateTime) && !isPast(candidateTime));
     if (free && free !== time) {
       dispatch({ type: "setTime", time: free });
     }

@@ -28,7 +28,7 @@ export function Card({ bike, perHourLabel, perDayLabel, bookedLabel, userEmail, 
     <article
       style={style}
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-[14px] border bg-card transition-[box-shadow,border-color] duration-150 hover:border-ring/40 hover:shadow-[0_8px_24px_-12px_rgb(0_0_0/0.18)]',
+        'group relative flex flex-col overflow-hidden rounded-[14px] border bg-card transition-shadow duration-200 hover:shadow-[0_20px_40px_-12px_color-mix(in_oklch,var(--primary)_35%,transparent)]',
         className,
       )}
     >
