@@ -1,6 +1,7 @@
 'use client';
 
 import { RiCalendarLine } from '@remixicon/react';
+import { format as formatDate } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { useFormatter, useLocale } from 'next-intl';
 import { useMemo, useState } from 'react';
@@ -36,11 +37,16 @@ export function Fields({ booking, bike }: FieldsProps) {
   }, []);
 
   const { from, to } = booking.range ?? {};
+  const dateFnsLocale = dateFnsLocales[locale as keyof typeof dateFnsLocales] ?? enUS;
 
+  // `from`/`to` are calendar days picked in the browser's local time, not
+  // instants — formatting them by local Y/M/D (via date-fns) instead of
+  // through a timezone-aware formatter keeps the displayed day in sync with
+  // the day the user actually clicked, regardless of server timezone.
   const label = from
     ? booking.days > 0 && to
-      ? `${format.dateTime(from, { dateStyle: 'medium' })} – ${format.dateTime(to, { dateStyle: 'medium' })}`
-      : format.dateTime(from, { dateStyle: 'long' })
+      ? `${formatDate(from, 'PP', { locale: dateFnsLocale })} – ${formatDate(to, 'PP', { locale: dateFnsLocale })}`
+      : formatDate(from, 'PPP', { locale: dateFnsLocale })
     : translate('pickDate');
 
   /** True once every hour-wide opening slot on `day` falls inside a booked window. */
@@ -139,7 +145,7 @@ export function Fields({ booking, bike }: FieldsProps) {
               modifiers={{ partiallyBooked: isPartiallyBooked }}
               modifiersClassNames={{ partiallyBooked: 'after:absolute after:bottom-1 after:size-1 after:rounded-full after:bg-destructive' }}
               max={MAX_DAYS + 1}
-              locale={dateFnsLocales[locale as keyof typeof dateFnsLocales] ?? enUS}
+              locale={dateFnsLocale}
               autoFocus
             />
             <Button
