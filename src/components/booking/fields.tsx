@@ -3,7 +3,7 @@
 import { RiCalendarLine, RiSubtractLine, RiAddLine } from '@remixicon/react';
 import { enUS } from 'date-fns/locale';
 import { useFormatter, useLocale } from 'next-intl';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { dateFnsLocales } from 'Components/booking/constants';
 import type { FieldsProps } from 'Components/booking/types';
@@ -25,6 +25,7 @@ export function Fields({ booking, bike }: FieldsProps) {
   const { translate } = booking;
   const locale = useLocale();
   const format = useFormatter();
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   const today = useMemo(() => {
     const start = new Date();
@@ -44,7 +45,7 @@ export function Fields({ booking, bike }: FieldsProps) {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <Label className="text-[13px]">{translate('date')}</Label>
-        <Popover>
+        <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="h-[38px] justify-start font-normal">
               <RiCalendarLine className="size-4 text-muted-foreground" />
@@ -61,6 +62,14 @@ export function Fields({ booking, bike }: FieldsProps) {
               locale={dateFnsLocales[locale as keyof typeof dateFnsLocales] ?? enUS}
               autoFocus
             />
+            <Button
+              type="button"
+              className="mx-2.5 mb-2.5"
+              disabled={!from}
+              onClick={() => setIsDatePickerOpen(false)}
+            >
+              {translate('pick')}
+            </Button>
           </PopoverContent>
         </Popover>
         <p className="text-xs text-muted-foreground">

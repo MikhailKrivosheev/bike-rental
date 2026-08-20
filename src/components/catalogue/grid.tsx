@@ -8,7 +8,7 @@ import { ALL_TYPES, FILTER_BUTTON_CLASS } from 'Components/catalogue/constants';
 import type { GridProps } from 'Components/catalogue/types';
 import { Button } from 'Components/ui/button';
 
-export function Grid({ bikes, filters }: GridProps) {
+export function Grid({ bikes, filters, isSignedIn }: GridProps) {
   const translate = useTranslations('Catalogue');
   const [active, setActive] = useState(ALL_TYPES);
 
@@ -43,14 +43,20 @@ export function Grid({ bikes, filters }: GridProps) {
       {visible.length === 0 ? (
         <p className="py-16 text-center text-sm text-muted-foreground">{translate('noMatches')}</p>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(320px,100%),1fr))] gap-5 pt-7 pb-18">
-          {visible.map((bike) => (
+        <div
+          key={active}
+          className="grid grid-cols-[repeat(auto-fill,minmax(min(320px,100%),1fr))] gap-5 pt-7 pb-18"
+        >
+          {visible.map((bike, index) => (
             <Card
               key={bike.id}
               bike={bike}
               perHourLabel={translate('perHour')}
               perDayLabel={translate('perDay')}
               bookedLabel={translate('booked')}
+              isSignedIn={isSignedIn}
+              className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards duration-300 ease-out"
+              style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
             />
           ))}
         </div>

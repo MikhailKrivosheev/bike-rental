@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 export type CardModel = {
   id: string;
   model: string;
@@ -20,6 +22,9 @@ export type CardProps = {
   perHourLabel: string;
   perDayLabel: string;
   bookedLabel: string;
+  isSignedIn: boolean;
+  className?: string;
+  style?: CSSProperties;
 };
 
 export type Filter = {
@@ -30,4 +35,5 @@ export type Filter = {
 export type GridProps = {
   bikes: CardModel[];
   filters: Filter[];
+  isSignedIn: boolean;
 };

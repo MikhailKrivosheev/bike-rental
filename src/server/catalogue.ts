@@ -21,6 +21,8 @@ export type CatalogueBike = {
   model: string;
   type: BikeType;
   status: BikeStatus;
+  /** Whether the bike can be booked right now — false while it's out on a rental that covers this moment, or under maintenance/retired. */
+  isAvailable: boolean;
   description: string | null;
   pricePerHour: number;
   pricePerDay: number;
@@ -30,14 +32,22 @@ export type CatalogueBike = {
   freesUpAt: string | null;
 };
 
-const withStationAndActiveRental = {
-  station: true,
-  rentals: {
-    where: { status: RentalStatus.ACTIVE },
-    orderBy: { endsAt: 'desc' },
-    take: 1,
-  },
-} as const;
+/**
+ * Rentals block a bike from the catalogue's "available now" badge only while
+ * they're actually under way — a rental starting in nine days shouldn't make
+ * the bike look booked today. Overlap for a *specific* requested slot is
+ * checked separately in `createBooking`.
+ */
+function withStationAndActiveRental(now: Date) {
+  return {
+    station: true,
+    rentals: {
+      where: { status: RentalStatus.ACTIVE, startsAt: { lte: now }, endsAt: { gt: now } },
+      orderBy: { endsAt: 'desc' },
+      take: 1,
+    },
+  } as const;
+}
 
 type BikeRow = {
   id: string;
@@ -58,6 +68,7 @@ function toCatalogueBike(bike: BikeRow): CatalogueBike {
     model: bike.model,
     type: bike.type,
     status: bike.status,
+    isAvailable: bike.status === BikeStatus.AVAILABLE && bike.rentals.length === 0,
     description: bike.description,
     pricePerHour: bike.pricePerHour,
     pricePerDay: bike.pricePerDay,
@@ -72,7 +83,7 @@ export const getCatalogueBikes = unstable_cache(
   async (): Promise<CatalogueBike[]> => {
     const bikes = await prisma.bike.findMany({
       where: { status: { not: BikeStatus.RETIRED } },
-      include: withStationAndActiveRental,
+      include: withStationAndActiveRental(new Date()),
       orderBy: [{ status: 'asc' }, { pricePerHour: 'asc' }],
     });
 
@@ -87,7 +98,7 @@ export const getBike = unstable_cache(
   async (id: string): Promise<CatalogueBike | null> => {
     const bike = await prisma.bike.findUnique({
       where: { id },
-      include: withStationAndActiveRental,
+      include: withStationAndActiveRental(new Date()),
     });
 
     return bike ? toCatalogueBike(bike) : null;

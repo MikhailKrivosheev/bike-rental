@@ -1,8 +1,9 @@
 import type * as React from 'react';
 
-import { CONTAINER_CLASS } from 'Components/shared/constants';
-import type { ContainerProps } from 'Components/shared/types';
 import { cn } from 'Lib/utils';
+import { ContainerProps } from './types';
+
+const CONTAINER_CLASS = 'mx-auto w-full max-w-[1180px] px-6';
 
 export function Container({ as = 'div', className, ...props }: ContainerProps) {
   const Element = as as React.ElementType;

@@ -8,7 +8,7 @@ export type BookingBike = {
   stationName: string;
 };
 
-export type BookingStep = 'details' | 'email' | 'code' | 'done';
+export type BookingStep = 'details' | 'email' | 'code' | 'summary' | 'done';
 
 export type Booking = ReturnType<typeof useBooking>;
 
@@ -20,6 +20,7 @@ export type AnimatedPriceProps = {
 export type DialogProps = {
   bike: BookingBike;
   className?: string;
+  isSignedIn: boolean;
 };
 
 export type FieldsProps = {
@@ -29,6 +30,7 @@ export type FieldsProps = {
 
 export type PanelProps = {
   bike: BookingBike;
+  isSignedIn: boolean;
 };
 
 export type StepsProps = {

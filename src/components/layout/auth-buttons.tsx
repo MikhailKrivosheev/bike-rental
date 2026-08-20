@@ -1,25 +1,34 @@
-'use client';
+import { getTranslations } from "next-intl/server";
 
-import { useTranslations } from 'next-intl';
-import { toast } from 'sonner';
+import { getCurrentUser } from "@/server/auth";
+import { getMyBookings } from "@/server/booking";
+import { MyBookingsAccessDialog } from "./my-bookings-access-dialog";
+import { MyBookingsDialog } from "./my-bookings-dialog";
+import { SignOutButton } from "./sign-out-button";
+import { SignInDialog } from "./sign-in-dialog";
 
-import { Button } from 'Components/ui/button';
+export async function AuthButtons() {
+  const translate = await getTranslations("Header");
+  const user = await getCurrentUser();
 
-/**
- * Placeholders from the design: there is no auth yet, so both buttons only
- * say so. Replace with real navigation once accounts exist.
- */
-export function AuthButtons() {
-  const translate = useTranslations('Header');
+  if (!user) {
+    return (
+      <div className="hidden items-center gap-2.5 sm:flex">
+        <MyBookingsAccessDialog label={translate("myBookings")} />
+        <SignInDialog />
+      </div>
+    );
+  }
+
+  const bookings = await getMyBookings(user.id);
 
   return (
     <div className="hidden items-center gap-2.5 sm:flex">
-      <Button variant="outline" className="h-9 px-3.5" onClick={() => toast(translate('comingSoon'))}>
-        {translate('myBookings')}
-      </Button>
-      <Button className="h-9 px-3.5" onClick={() => toast(translate('comingSoon'))}>
-        {translate('signIn')}
-      </Button>
+      <span className="max-w-[180px] truncate text-sm text-muted-foreground" title={user.email}>
+        {user.email}
+      </span>
+      <MyBookingsDialog bookings={bookings} label={translate("myBookings")} />
+      <SignOutButton label={translate("signOut")} />
     </div>
   );
 }

@@ -13,7 +13,30 @@
     "language": "Language",
     "myBookings": "My bookings",
     "signIn": "Sign in",
-    "comingSoon": "Accounts are coming soon."
+    "signOut": "Sign out",
+    "signInTitle": "Sign in",
+    "signInDescription": "Sign in to see your bookings.",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "signInButton": "Sign in",
+    "signingIn": "Signing in…",
+    "cancel": "Cancel",
+    "myBookingsAccessTitle": "My bookings",
+    "myBookingsAccessDescription": "Enter the email you booked with — we'll send a 6-digit code, no password needed.",
+    "sendCode": "Send code",
+    "sendingCode": "Sending…",
+    "myBookingsCodeTitle": "Enter the code",
+    "myBookingsCodeDescription": "We sent a 6-digit code to {email}.",
+    "verifyCode": "Continue",
+    "verifyingCode": "Checking…",
+    "errors": {
+      "invalidCredentials": "Wrong email or password.",
+      "invalidEmail": "Enter a valid email address.",
+      "noAccount": "We couldn't find a booking for that email.",
+      "codeExpired": "That code has expired. Request a new one.",
+      "wrongCode": "That code is incorrect.",
+      "tooManyAttempts": "Too many attempts. Request a new code."
+    }
   },
   "Footer": {
     "about": "Bikes by the hour, all over the city. Open every day from 8:00 to 23:00.",
@@ -26,7 +49,7 @@
     ],
     "support": "Support",
     "supportItems": [
-      "+351 900 000 000",
+      "+351 22 938 3371",
       "help@bikerental.example",
       "Live chat"
     ],
@@ -66,15 +89,19 @@
     "perDay": "/ day"
   },
   "BikeDescriptions": {
-    "gravel": "A fast, forgiving gravel bike for mixed surfaces — wide tyres, relaxed geometry and mounts for everything you need on a long day out.",
-    "mtb": "A hardtail mountain bike built for trails and singletrack: air fork, hydraulic disc brakes and grippy 29\" tyres.",
-    "urban": "A women's step-through city bike with an upright riding position, fenders and a rack — perfect for commuting and relaxed rides."
+    "gravel": "A fast, forgiving gravel bike for mixed surfaces — wide tyres, relaxed geometry and mounts for everything you need on a long day out. The 45 mm tyres soak up gravel, cobblestones and the odd rough trail without giving up speed on tarmac, while the endurance geometry keeps you comfortable well past the first hour. Hydraulic disc brakes and a 2×11 Shimano GRX groupset give you confident stopping power and enough range for flat coastal rides and the climbs further inland. Rack and fender mounts mean it doubles as a capable day-trip bike whenever you want to go further.",
+    "mtb": "A hardtail mountain bike built for trails and singletrack: air fork, hydraulic disc brakes and grippy 29\" tyres. The front suspension soaks up roots and rock gardens while the stiff aluminium frame keeps pedalling efficient on climbs and fire roads. A 1×12 Shimano Deore drivetrain gives you a wide enough gear range to grind up steep singletrack without ever needing a front derailleur to fuss with. Whether you're new to trail riding or chasing something quick for an afternoon in the hills, it's a forgiving, confidence-inspiring bike that doesn't punish small mistakes.",
+    "urban": "A women's step-through city bike with an upright riding position, fenders and a rack — perfect for commuting and relaxed rides. The low step-through frame makes getting on and off easy in everyday clothes, and the upright bars keep your back relaxed even on longer rides across town. Seven gears cover gentle hills without fuss, while full fenders and a rear rack mean you can carry groceries or a bag without a second thought. A comfortable saddle rounds it out as an easy, no-drama way to get around the city.",
+    "vanmoof": "A sleek, minimalist urban electric bike with integrated smart features, automatic electronic gear shifting and anti-theft protection — ideal for fast city commutes. A 250 W mid-drive motor and automatic gear shifting take the effort out of hills and stop-start traffic, so you arrive without breaking a sweat. Integrated LED lights and a boost button for quick getaways from the lights make it a natural fit for weaving through city streets after dark. Built-in GPS tracking and an alarm mean you can lock it up outside a café without worrying, and the minimalist aluminium frame keeps it light enough to carry up a flight of stairs.",
+    "diverge": "A highly versatile gravel bike equipped with Future Shock handlebar suspension, wide tyre clearance and balanced geometry for smooth gravel paths and tarmac alike. The Future Shock absorbs bumps and chatter through the front end without the weight or complexity of a full suspension fork, keeping your hands fresh over long, rough stretches. Wide tyre clearance lets you run anything from fast-rolling gravel tyres to something knobblier for looser trails, and the balanced endurance geometry keeps you comfortable across mixed terrain. A carbon fork and hydraulic disc brakes round it out with confident handling and reliable stopping power whatever the surface.",
+    "marlin": "A trail-ready hardtail mountain bike with a lightweight RockShox air fork, 1×10 Shimano drivetrain and hydraulic disc brakes built for rugged off-road paths. The RockShox air fork soaks up roots, rocks and drops while staying light enough to keep climbs efficient. A wide-range 1×10 drivetrain gives you enough gearing for steep singletrack without the extra weight and complexity of a front derailleur. Hydraulic disc brakes deliver confident, consistent stopping power in mud or dust, making it a dependable choice whether you're new to the trails or just want something quick for an afternoon in the hills."
   },
   "Booking": {
     "trigger": "Book",
     "title": "{model}",
     "date": "Dates",
     "pickDate": "Pick a date or range",
+    "pick": "Pick",
     "duration": "Duration",
     "accessories": "Add-ons",
     "accessory": {
@@ -94,7 +121,12 @@
     "confirm": "Confirm booking",
     "confirming": "Confirming…",
     "successTitle": "Booking confirmed",
-    "successDescription": "We've emailed the details to {email}. Pay with MBWay when you pick the bike up.",
+    "successDescription": "We've emailed the details to {email}.",
+    "payTitle": "Confirm and pay",
+    "payDescription": "Review your booking and pay with MBWay to confirm it.",
+    "payButton": "Pay with MBWay",
+    "paying": "Paying…",
+    "summaryEmail": "Email",
     "errors": {
       "invalidInput": "Please check the booking details and try again.",
       "pastDate": "Pick a date in the future.",
@@ -148,7 +180,39 @@
       "Step-through frame",
       "7 speeds",
       "Rack & fenders"
+    ],
+    "vanmoof": [
+      "Electric",
+      "Smart features",
+      "Integrated lights"
+    ],
+    "diverge": [
+      "Future Shock",
+      "Carbon fork",
+      "Disc brakes"
+    ],
+    "marlin": [
+      "RockShox fork",
+      "1×10 drivetrain",
+      "Hydraulic brakes"
     ]
+  },
+  "MyBookings": {
+    "title": "My bookings",
+    "description": "Bikes you've booked, most recent first.",
+    "empty": "You haven't booked a bike yet.",
+    "status": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "PickupPoints": {
+    "title": "Pickup points",
+    "subtitle": "Choose a point to see it on the map.",
+    "addressLabel": "Address",
+    "empty": "No pickup points yet."
   },
   "BikeSpecTable": {
     "gravel": {
@@ -171,6 +235,27 @@
       "Brakes": "V-brake",
       "Weight": "14.5 kg",
       "Rider height": "155–180 cm"
+    },
+    "vanmoof": {
+      "Frame": "Aluminium",
+      "Motor": "250 W mid-drive",
+      "Brakes": "Hydraulic disc",
+      "Weight": "19.5 kg",
+      "Rider height": "165–195 cm"
+    },
+    "diverge": {
+      "Frame": "Carbon",
+      "Groupset": "Shimano GRX 2×11",
+      "Brakes": "Hydraulic disc",
+      "Weight": "9.8 kg",
+      "Rider height": "165–195 cm"
+    },
+    "marlin": {
+      "Frame": "Aluminium hardtail",
+      "Groupset": "Shimano 1×10",
+      "Brakes": "Hydraulic disc",
+      "Weight": "13.8 kg",
+      "Rider height": "160–190 cm"
     }
   }
 }

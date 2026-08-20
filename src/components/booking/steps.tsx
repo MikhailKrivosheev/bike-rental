@@ -11,7 +11,6 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from 'Components/ui/input-otp';
 import { Label } from 'Components/ui/label';
 import { AnimatedPrice } from 'Components/booking/animated-price';
 
-/** The email → code → confirmation part of the flow, shared by both entry points. */
 export function Steps({ booking, bike, onCancel }: StepsProps) {
   const { translate } = booking;
   const format = useFormatter();
@@ -97,6 +96,57 @@ export function Steps({ booking, bike, onCancel }: StepsProps) {
             disabled={booking.isPending || booking.code.length < CODE_LENGTH}
           >
             {booking.isPending ? translate('confirming') : translate('confirm')}
+          </Button>
+        </DialogFooter>
+      </>
+    );
+  }
+
+  if (booking.step === 'summary' && booking.startsAt) {
+    const rows = [
+      { label: translate('summaryBike'), value: bike.model },
+      {
+        label: translate('summaryStart'),
+        value: format.dateTime(booking.startsAt, { dateStyle: 'medium', timeStyle: 'short' }),
+      },
+      {
+        label: translate('summaryDuration'),
+        value:
+          booking.quote.unit === 'day'
+            ? translate('days', { days: booking.quote.units })
+            : translate('hours', { hours: booking.quote.units }),
+      },
+      { label: translate('summaryEmail'), value: booking.email },
+    ];
+
+    return (
+      <>
+        <DialogHeader>
+          <DialogTitle className="text-[17px]">{translate('payTitle')}</DialogTitle>
+          <DialogDescription>{translate('payDescription')}</DialogDescription>
+        </DialogHeader>
+
+        <dl className="flex flex-col gap-2.5 rounded-[10px] bg-muted px-3.5 py-3 text-sm">
+          {rows.map((row) => (
+            <div key={row.label} className="flex justify-between gap-4">
+              <dt className="text-muted-foreground">{row.label}</dt>
+              <dd className="font-medium">{row.value}</dd>
+            </div>
+          ))}
+          <div className="flex justify-between gap-4 border-t pt-2.5">
+            <dt className="text-muted-foreground">{translate('summaryTotal')}</dt>
+            <dd>
+              <AnimatedPrice cents={booking.total} className="font-semibold" />
+            </dd>
+          </div>
+        </dl>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onCancel}>
+            {translate('cancel')}
+          </Button>
+          <Button onClick={booking.pay} disabled={booking.isPending}>
+            {booking.isPending ? translate('paying') : translate('payButton')}
           </Button>
         </DialogFooter>
       </>

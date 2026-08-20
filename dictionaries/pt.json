@@ -13,23 +13,38 @@
     "language": "Idioma",
     "myBookings": "As minhas reservas",
     "signIn": "Entrar",
-    "comingSoon": "As contas estão a caminho."
+    "signOut": "Sair",
+    "signInTitle": "Entrar",
+    "signInDescription": "Entre para ver as suas reservas.",
+    "emailLabel": "Email",
+    "passwordLabel": "Palavra-passe",
+    "signInButton": "Entrar",
+    "signingIn": "A entrar…",
+    "cancel": "Cancelar",
+    "myBookingsAccessTitle": "As minhas reservas",
+    "myBookingsAccessDescription": "Indique o email usado na reserva — enviamos um código de 6 dígitos, sem precisar de palavra-passe.",
+    "sendCode": "Enviar código",
+    "sendingCode": "A enviar…",
+    "myBookingsCodeTitle": "Introduza o código",
+    "myBookingsCodeDescription": "Enviámos um código de 6 dígitos para {email}.",
+    "verifyCode": "Continuar",
+    "verifyingCode": "A verificar…",
+    "errors": {
+      "invalidCredentials": "Email ou palavra-passe incorretos.",
+      "invalidEmail": "Indique um email válido.",
+      "noAccount": "Não encontrámos nenhuma reserva com esse email.",
+      "codeExpired": "Esse código expirou. Peça um novo.",
+      "wrongCode": "Esse código está incorreto.",
+      "tooManyAttempts": "Demasiadas tentativas. Peça um novo código."
+    }
   },
   "Footer": {
     "about": "Bicicletas à hora, por toda a cidade. Aberto todos os dias das 8:00 às 23:00.",
     "pickupPoints": "Pontos de levantamento",
     "service": "Serviço",
-    "serviceItems": [
-      "Como funciona",
-      "Preços",
-      "Condições de aluguer"
-    ],
+    "serviceItems": ["Como funciona", "Preços", "Condições de aluguer"],
     "support": "Apoio",
-    "supportItems": [
-      "+351 900 000 000",
-      "help@bikerental.example",
-      "Chat"
-    ],
+    "supportItems": ["+351 22 938 3371", "help@bikerental.example", "Chat"],
     "copyright": "© {year} Velo",
     "legal": "Termos de serviço · Política de privacidade"
   },
@@ -66,15 +81,19 @@
     "perDay": "/ dia"
   },
   "BikeDescriptions": {
-    "gravel": "Uma bicicleta de gravel rápida e tolerante para pisos mistos — pneus largos, geometria descontraída e suportes para tudo o que precisa num dia longo.",
-    "mtb": "Uma BTT hardtail feita para trilhos e singletrack: forqueta de ar, travões de disco hidráulicos e pneus 29\" com muita aderência.",
-    "urban": "Uma bicicleta de cidade de quadro baixo para senhora, com posição de condução direita, guarda-lamas e porta-bagagens — ideal para o dia a dia e passeios tranquilos."
+    "gravel": "Uma bicicleta de gravel rápida e tolerante para pisos mistos — pneus largos, geometria descontraída e suportes para tudo o que precisa num dia longo. Os pneus de 45 mm absorvem gravilha, calçada e alguns troços mais irregulares sem perder velocidade no alcatrão, e a geometria endurance mantém-no confortável muito depois da primeira hora. Os travões de disco hidráulicos e a transmissão Shimano GRX 2×11 dão-lhe travagem segura e um leque de desenvolvimentos suficiente tanto para passeios costeiros planos como para as subidas mais para o interior. Os suportes para porta-bagagens e guarda-lamas fazem dela também uma boa companheira para escapadinhas de um dia, sempre que quiser ir mais longe.",
+    "mtb": "Uma BTT hardtail feita para trilhos e singletrack: forqueta de ar, travões de disco hidráulicos e pneus 29\" com muita aderência. A suspensão dianteira absorve raízes e pedras enquanto o quadro rígido em alumínio mantém a pedalada eficiente nas subidas e caminhos florestais. A transmissão Shimano Deore 1×12 dá-lhe um leque de desenvolvimentos suficiente para subir singletrack inclinado sem nunca precisar de mexer num derailleur dianteiro. Seja para quem está a começar no trail ou para quem procura algo ágil para uma tarde na serra, é uma bicicleta tolerante e que dá confiança, sem castigar pequenos erros.",
+    "urban": "Uma bicicleta de cidade de quadro baixo para senhora, com posição de condução direita, guarda-lamas e porta-bagagens — ideal para o dia a dia e passeios tranquilos. O quadro de entrada baixa facilita subir e descer da bicicleta com roupa do dia a dia, e o guiador direito mantém as costas relaxadas mesmo em percursos mais longos pela cidade. As 7 velocidades dão conta de ligeiras subidas sem complicações, enquanto os guarda-lamas completos e o porta-bagagens traseiro permitem levar compras ou uma mala sem pensar duas vezes. Um selim confortável completa esta forma simples e sem stress de andar pela cidade.",
+    "vanmoof": "Uma bicicleta elétrica urbana minimalista e elegante, com funcionalidades inteligentes integradas, mudanças eletrónicas automáticas e proteção antifurto — ideal para deslocações rápidas na cidade. Um motor central de 250 W e a mudança automática de velocidades tiram o esforço das subidas e do trânsito com paragens frequentes, para chegar sem suar. As luzes LED integradas e um botão de arranque rápido para sair dos semáforos tornam-na ideal para andar pelas ruas da cidade mesmo de noite. O GPS integrado e o alarme permitem estacioná-la à porta de um café sem preocupações, e o quadro minimalista em alumínio mantém-na leve o suficiente para subir um lance de escadas.",
+    "diverge": "Uma bicicleta de gravel muito versátil, equipada com suspensão Future Shock no guiador, folga ampla para pneus largos e geometria equilibrada para pisos de gravilha e alcatrão. O Future Shock absorve solavancos e vibrações na parte dianteira sem o peso ou a complexidade de uma forqueta com suspensão completa, mantendo as mãos descansadas em percursos longos e irregulares. A folga ampla para pneus permite usar desde pneus rápidos de gravel até modelos com mais piso para trilhos soltos, e a geometria endurance equilibrada mantém-no confortável em terrenos mistos. Uma forqueta em carbono e travões de disco hidráulicos completam o conjunto com um comportamento seguro e travagem fiável em qualquer piso.",
+    "marlin": "Uma BTT hardtail pronta para trilhos, com forqueta de ar RockShox leve, transmissão Shimano 1×10 e travões de disco hidráulicos, feita para caminhos irregulares. A forqueta de ar RockShox absorve raízes, pedras e quedas mantendo-se leve o suficiente para não penalizar as subidas. Uma transmissão 1×10 de largo alcance dá-lhe desenvolvimentos suficientes para singletrack inclinado sem o peso e a complexidade extra de um derailleur dianteiro. Os travões de disco hidráulicos garantem uma travagem confiante e consistente na lama ou no pó, tornando-a uma escolha fiável seja para quem está a começar nos trilhos ou só quer algo ágil para uma tarde na serra."
   },
   "Booking": {
     "trigger": "Reservar",
     "title": "{model}",
     "date": "Datas",
     "pickDate": "Escolha uma data ou intervalo",
+    "pick": "Escolher",
     "duration": "Duração",
     "accessories": "Extras",
     "accessory": {
@@ -94,7 +113,12 @@
     "confirm": "Confirmar reserva",
     "confirming": "A confirmar…",
     "successTitle": "Reserva confirmada",
-    "successDescription": "Enviámos os detalhes para {email}. Pague com MBWay no levantamento.",
+    "successDescription": "Enviámos os detalhes para {email}.",
+    "payTitle": "Confirmar e pagar",
+    "payDescription": "Reveja a sua reserva e pague com MBWay para a confirmar.",
+    "payButton": "Pagar com MBWay",
+    "paying": "A pagar…",
+    "summaryEmail": "Email",
     "errors": {
       "invalidInput": "Verifique os dados da reserva e tente novamente.",
       "pastDate": "Escolha uma data futura.",
@@ -134,21 +158,33 @@
     "subtitle": "Escolha uma bicicleta, indique a hora e levante-a no ponto mais próximo. Reservar demora menos de um minuto e paga depois do passeio."
   },
   "BikeSpecs": {
-    "gravel": [
-      "Pneus de 45 mm",
-      "2×11 velocidades",
-      "Suportes para bagageiro"
-    ],
-    "mtb": [
-      "Rodas de 29\"",
-      "Forqueta de ar",
-      "Travões hidráulicos"
-    ],
+    "gravel": ["Pneus de 45 mm", "2×11 velocidades", "Suportes para bagageiro"],
+    "mtb": ["Rodas de 29\"", "Forqueta de ar", "Travões hidráulicos"],
     "urban": [
       "Quadro de entrada baixa",
       "7 velocidades",
       "Bagageiro e guarda-lamas"
-    ]
+    ],
+    "vanmoof": ["Elétrica", "Funcionalidades inteligentes", "Luzes integradas"],
+    "diverge": ["Future Shock", "Forqueta em carbono", "Travões de disco"],
+    "marlin": ["Forqueta RockShox", "Transmissão 1×10", "Travões hidráulicos"]
+  },
+  "MyBookings": {
+    "title": "As minhas reservas",
+    "description": "Bicicletas que reservou, mais recentes primeiro.",
+    "empty": "Ainda não reservou nenhuma bicicleta.",
+    "status": {
+      "PENDING": "Pendente",
+      "ACTIVE": "Ativa",
+      "COMPLETED": "Concluída",
+      "CANCELLED": "Cancelada"
+    }
+  },
+  "PickupPoints": {
+    "title": "Pontos de levantamento",
+    "subtitle": "Escolha um ponto para o ver no mapa.",
+    "addressLabel": "Morada",
+    "empty": "Ainda não há pontos de levantamento."
   },
   "BikeSpecTable": {
     "gravel": {
@@ -171,6 +207,27 @@
       "Travões": "Travão V",
       "Peso": "14,5 kg",
       "Altura do ciclista": "155–180 cm"
+    },
+    "vanmoof": {
+      "Quadro": "Alumínio",
+      "Motor": "Central de 250 W",
+      "Travões": "Disco hidráulico",
+      "Peso": "19,5 kg",
+      "Altura do ciclista": "165–195 cm"
+    },
+    "diverge": {
+      "Quadro": "Carbono",
+      "Transmissão": "Shimano GRX 2×11",
+      "Travões": "Disco hidráulico",
+      "Peso": "9,8 kg",
+      "Altura do ciclista": "165–195 cm"
+    },
+    "marlin": {
+      "Quadro": "Alumínio hardtail",
+      "Transmissão": "Shimano 1×10",
+      "Travões": "Disco hidráulico",
+      "Peso": "13,8 kg",
+      "Altura do ciclista": "160–190 cm"
     }
   }
 }

@@ -1,18 +1,18 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations } from "next-intl/server";
 
-import { AuthButtons } from 'Components/layout/auth-buttons';
-import { LocaleSwitcher } from 'Components/locale-switcher';
-import { Container } from 'Components/shared/container';
-import { ThemeToggle } from 'Components/theme-toggle';
-import { Link } from '@/i18n/navigation';
+import { AuthButtons } from "Components/layout/auth-buttons";
+import { LocaleSwitcher } from "Components/locale-switcher";
+import { Container } from "@/components/shared/container";
+import { ThemeToggle } from "Components/theme-toggle";
+import { Link } from "@/i18n/navigation";
 
 export async function Header() {
-  const translate = await getTranslations('Header');
+  const translate = await getTranslations("Header");
 
   const links = [
-    { href: '/#catalogue', label: translate('catalogue') },
-    { href: '/#how-it-works', label: translate('howItWorks') },
-    { href: '/#pickup-points', label: translate('pickupPoints') },
+    { href: "/#catalogue", label: translate("catalogue") },
+    { href: "/#how-it-works", label: translate("howItWorks") },
+    { href: "/pickup-points", label: translate("pickupPoints") },
   ];
 
   return (
@@ -20,14 +20,20 @@ export async function Header() {
       <Container className="flex h-16 items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
-            {translate('brandInitial')}
+            {translate("brandInitial")}
           </span>
-          <span className="text-[15px] font-semibold tracking-[-0.01em]">{translate('brand')}</span>
+          <span className="text-[15px] font-semibold tracking-[-0.01em]">
+            {translate("brand")}
+          </span>
         </Link>
 
         <nav className="hidden gap-6 text-sm text-muted-foreground sm:flex">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground">
+            <Link
+              key={link.href}
+              href={link.href}
+              className="transition-colors hover:text-foreground"
+            >
               {link.label}
             </Link>
           ))}

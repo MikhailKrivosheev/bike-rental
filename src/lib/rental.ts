@@ -71,8 +71,11 @@ export function quoteRental(
   options: { days?: number; hours: number; accessories: readonly string[] },
 ): RentalQuote {
   const days = options.days ?? 0;
-  const unit = days > 0 ? 'day' : 'hour';
-  const units = unit === 'day' ? days : options.hours;
+  // A full 24-hour picked without a date range is a calendar day, so it
+  // should get the day rate rather than 24× the hourly one.
+  const isFullDayByHours = days === 0 && options.hours >= MAX_HOURS;
+  const unit = days > 0 || isFullDayByHours ? 'day' : 'hour';
+  const units = unit === 'day' ? days || 1 : options.hours;
   const unitPrice = unit === 'day' ? prices.pricePerDay : prices.pricePerHour;
   const addOns = accessoriesPrice(options.accessories);
 

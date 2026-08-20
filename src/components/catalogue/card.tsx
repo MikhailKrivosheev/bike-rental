@@ -16,7 +16,7 @@ import { Button } from 'Components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { cn } from 'Lib/utils';
 
-export function Card({ bike, perHourLabel, perDayLabel, bookedLabel }: CardProps) {
+export function Card({ bike, perHourLabel, perDayLabel, bookedLabel, isSignedIn, className, style }: CardProps) {
   const imageClassName = cn(CARD_IMAGE_CLASS, !bike.isAvailable && CARD_IMAGE_BOOKED_CLASS);
 
   const availabilityClassName = cn(
@@ -25,7 +25,13 @@ export function Card({ bike, perHourLabel, perDayLabel, bookedLabel }: CardProps
   );
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-[14px] border bg-card transition-[box-shadow,border-color] duration-150 hover:border-ring/40 hover:shadow-[0_8px_24px_-12px_rgb(0_0_0/0.18)]">
+    <article
+      style={style}
+      className={cn(
+        'group relative flex flex-col overflow-hidden rounded-[14px] border bg-card transition-[box-shadow,border-color] duration-150 hover:border-ring/40 hover:shadow-[0_8px_24px_-12px_rgb(0_0_0/0.18)]',
+        className,
+      )}
+    >
       <div className="relative aspect-4/3 border-b bg-muted">
         {bike.imageUrl ? (
           <Image
@@ -56,7 +62,7 @@ export function Card({ bike, perHourLabel, perDayLabel, bookedLabel }: CardProps
           </Link>
         </h3>
 
-        <p className="text-sm leading-[1.55] text-pretty text-muted-foreground">{bike.description}</p>
+        <p className="line-clamp-3 text-sm leading-[1.55] text-pretty text-muted-foreground">{bike.description}</p>
 
         <div className="mt-0.5 flex flex-wrap gap-1.5">
           {bike.specs.map((spec) => (
@@ -85,6 +91,7 @@ export function Card({ bike, perHourLabel, perDayLabel, bookedLabel }: CardProps
           {bike.isAvailable ? (
             <Dialog
               className="relative z-10 h-9 px-4"
+              isSignedIn={isSignedIn}
               bike={{
                 id: bike.id,
                 model: bike.model,

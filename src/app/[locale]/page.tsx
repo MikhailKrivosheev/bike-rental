@@ -2,9 +2,10 @@ import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
 
 import { Grid } from 'Components/catalogue/grid';
 import type { CardModel } from 'Components/catalogue/types';
-import { Section } from 'Components/shared/section';
-import { BikeStatus, BikeType } from '@/generated/prisma/enums';
+import { Section } from '@/components/shared/section';
+import { BikeType } from '@/generated/prisma/enums';
 import { formatPrice } from 'Lib/format';
+import { getCurrentUser } from '@/server/auth';
 import { getCatalogueBikes } from '@/server/catalogue';
 
 // Prerendered and refreshed in the background; booking a bike flushes it early
@@ -30,10 +31,10 @@ export default async function Home() {
     getTranslations('BikeDescriptions'),
   ]);
 
-  const bikes = await getCatalogueBikes();
+  const [bikes, user] = await Promise.all([getCatalogueBikes(), getCurrentUser()]);
 
   const cards: CardModel[] = bikes.map((bike) => {
-    const isAvailable = bike.status === BikeStatus.AVAILABLE;
+    const isAvailable = bike.isAvailable;
     const freesUpAt = bike.freesUpAt ? new Date(bike.freesUpAt) : undefined;
 
     return {
@@ -55,7 +56,9 @@ export default async function Home() {
       availabilityLabel: isAvailable
         ? translateCatalogue('free')
         : freesUpAt
-          ? translateCatalogue('bookedUntil', { time: format.dateTime(freesUpAt, { timeStyle: 'short' }) })
+          ? translateCatalogue('bookedUntil', {
+              time: format.dateTime(freesUpAt, { dateStyle: 'medium', timeStyle: 'short' }),
+            })
           : translateCatalogue('booked'),
     };
   });
@@ -90,6 +93,7 @@ export default async function Home() {
               value: type,
               label: translateType(type),
             }))}
+            isSignedIn={Boolean(user)}
           />
         )}
       </Section>

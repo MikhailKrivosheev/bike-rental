@@ -1,7 +1,5 @@
 "use server";
 
-import { createHash, randomInt } from "node:crypto";
-
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { updateTag } from "next/cache";
@@ -18,27 +16,10 @@ import {
   pickupTimes,
   quoteRental,
 } from "Lib/rental";
+import { CODE_TTL_MINUTES, MAX_ATTEMPTS, codeMatches, generateCode, hashCode } from "Lib/otp";
 import { prisma } from "Lib/prisma";
 import { BIKES_TAG } from "@/server/catalogue";
 import { sendVerificationCode } from "@/server/email";
-
-const CODE_LENGTH = 6;
-const CODE_TTL_MINUTES = 10;
-const MAX_ATTEMPTS = 5;
-
-/**
- * Temporary test bypass until Resend delivers the real codes. It is refused in
- * production builds unless ALLOW_DEV_OTP is explicitly set, so it can never
- * quietly reach a deployed environment.
- */
-const DEV_CODE = "111111";
-
-function devCodeAllowed() {
-  return (
-    process.env.NODE_ENV !== "production" ||
-    process.env.ALLOW_DEV_OTP === "true"
-  );
-}
 
 export type BookingResult =
   { ok: true; rentalId: string } | { ok: false; error: string };
@@ -65,10 +46,6 @@ function resolveLocale(requested: string) {
   return hasLocale(routing.locales, requested)
     ? requested
     : routing.defaultLocale;
-}
-
-function hashCode(code: string) {
-  return createHash("sha256").update(code).digest("hex");
 }
 
 function atTime(date: string, time: string) {
@@ -115,7 +92,24 @@ export async function createBooking(
     return { ok: false, error: translateError("bikeNotFound") };
   }
 
-  if (bike.status !== BikeStatus.AVAILABLE) {
+  if (bike.status === BikeStatus.MAINTENANCE || bike.status === BikeStatus.RETIRED) {
+    return { ok: false, error: translateError("bikeUnavailable") };
+  }
+
+  // Availability is per time slot, not a single global flag — a bike booked
+  // nine days out must stay bookable by everyone else until then, so this
+  // checks for an actual overlap with existing (unpaid or paid) rentals
+  // instead of a blanket bike.status.
+  const overlappingRental = await prisma.rental.findFirst({
+    where: {
+      bikeId: bike.id,
+      status: { in: [RentalStatus.PENDING, RentalStatus.ACTIVE] },
+      startsAt: { lt: endsAt },
+      endsAt: { gt: startsAt },
+    },
+  });
+
+  if (overlappingRental) {
     return { ok: false, error: translateError("bikeUnavailable") };
   }
 
@@ -127,9 +121,7 @@ export async function createBooking(
     create: { email, name: email.split("@")[0] },
   });
 
-  const code = randomInt(0, 10 ** CODE_LENGTH)
-    .toString()
-    .padStart(CODE_LENGTH, "0");
+  const code = generateCode();
 
   const rental = await prisma.rental.create({
     data: {
@@ -185,11 +177,8 @@ export async function confirmBooking(
   }
 
   const submitted = code.trim();
-  const accepted =
-    verification.codeHash === hashCode(submitted) ||
-    (devCodeAllowed() && submitted === DEV_CODE);
 
-  if (!accepted) {
+  if (!codeMatches(submitted, verification.codeHash)) {
     await prisma.verificationCode.update({
       where: { id: verification.id },
       data: { attempts: { increment: 1 } },
@@ -198,29 +187,84 @@ export async function confirmBooking(
     return { ok: false, error: translateError("wrongCode") };
   }
 
-  await prisma.$transaction([
-    prisma.verificationCode.update({
-      where: { id: verification.id },
-      data: { consumedAt: new Date() },
-    }),
-    prisma.rental.update({
-      where: { id: rental.id },
-      data: { status: RentalStatus.ACTIVE },
-    }),
-    prisma.bike.update({
-      where: { id: rental.bikeId },
-      data: { status: BikeStatus.RENTED },
-    }),
-  ]);
-
-  // Flushes the cached queries and every prerendered page built from them, in
-  // all locales. `updateTag` rather than `revalidateTag` so the customer's next
-  // request waits for fresh data instead of being shown the bike as free.
-  updateTag(BIKES_TAG);
+  // The rental stays PENDING until the customer pays on the summary step;
+  // this just proves the email is theirs.
+  await prisma.verificationCode.update({
+    where: { id: verification.id },
+    data: { consumedAt: new Date() },
+  });
 
   return {
     ok: true,
     startsAt: rental.startsAt.toISOString(),
     endsAt: rental.endsAt.toISOString(),
   };
+}
+
+export type MyBooking = {
+  id: string;
+  bikeModel: string;
+  status: RentalStatus;
+  startsAt: string;
+  endsAt: string;
+  totalPrice: number;
+};
+
+export async function getMyBookings(userId: string): Promise<MyBooking[]> {
+  const rentals = await prisma.rental.findMany({
+    where: { userId },
+    include: { bike: true },
+    orderBy: { startsAt: "desc" },
+  });
+
+  return rentals.map((rental) => ({
+    id: rental.id,
+    bikeModel: rental.bike.model,
+    status: rental.status,
+    startsAt: rental.startsAt.toISOString(),
+    endsAt: rental.endsAt.toISOString(),
+    totalPrice: rental.totalPrice,
+  }));
+}
+
+export type PaymentResult = { ok: true } | { ok: false; error: string };
+
+/** Stand-in for the real MBWay charge, which will replace this later. */
+export async function payBooking(
+  rentalId: string,
+  requestedLocale: string,
+): Promise<PaymentResult> {
+  const locale = resolveLocale(requestedLocale);
+  const translateError = await getTranslations({
+    locale,
+    namespace: "Booking.errors",
+  });
+
+  const rental = await prisma.rental.findUnique({
+    where: { id: rentalId },
+    include: { verification: true },
+  });
+
+  if (
+    !rental?.verification?.consumedAt ||
+    rental.status !== RentalStatus.PENDING
+  ) {
+    return { ok: false, error: translateError("bookingNotFound") };
+  }
+
+  // Paying confirms the rental, not the bike's global status — the bike stays
+  // AVAILABLE for every other slot; only this rental's own [startsAt, endsAt)
+  // window is now taken, which the catalogue and createBooking derive from
+  // the Rental table directly.
+  await prisma.rental.update({
+    where: { id: rental.id },
+    data: { status: RentalStatus.ACTIVE },
+  });
+
+  // Flushes the cached queries and every prerendered page built from them, in
+  // all locales. `updateTag` rather than `revalidateTag` so the customer's next
+  // request waits for fresh data instead of being shown the bike as free.
+  updateTag(BIKES_TAG);
+
+  return { ok: true };
 }

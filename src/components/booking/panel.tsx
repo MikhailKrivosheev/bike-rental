@@ -8,13 +8,14 @@ import { Steps } from 'Components/booking/steps';
 import { Total } from 'Components/booking/total';
 import { useBooking } from 'Components/booking/hooks/use-booking';
 import type { PanelProps } from 'Components/booking/types';
+import { SignInDialog } from 'Components/layout/sign-in-dialog';
 import { Button } from 'Components/ui/button';
 import { Dialog as DialogRoot, DialogContent } from 'Components/ui/dialog';
 import { Separator } from 'Components/ui/separator';
 import { formatPrice } from 'Lib/format';
 
 /** Booking entry point on the bike page: fields sit in the sticky sidebar. */
-export function Panel({ bike }: PanelProps) {
+export function Panel({ bike, isSignedIn }: PanelProps) {
   const booking = useBooking(bike);
   const locale = useLocale();
   const [open, setOpen] = useState(false);
@@ -50,16 +51,26 @@ export function Panel({ bike }: PanelProps) {
 
       <Total booking={booking} bike={bike} />
 
-      <Button
-        className="h-[42px] rounded-[9px] text-[15px]"
-        disabled={!booking.canContinue}
-        onClick={() => {
-          booking.setStep('email');
-          setOpen(true);
-        }}
-      >
-        {translate('trigger')}
-      </Button>
+      {isSignedIn ? (
+        <Button
+          className="h-[42px] rounded-[9px] text-[15px]"
+          disabled={!booking.canContinue}
+          onClick={() => {
+            booking.setStep('email');
+            setOpen(true);
+          }}
+        >
+          {translate('trigger')}
+        </Button>
+      ) : (
+        <SignInDialog
+          trigger={
+            <Button className="h-[42px] rounded-[9px] text-[15px]" disabled={!booking.canContinue}>
+              {translate('trigger')}
+            </Button>
+          }
+        />
+      )}
 
       <p className="text-center text-xs text-muted-foreground">{translate('cancellationNote')}</p>
 

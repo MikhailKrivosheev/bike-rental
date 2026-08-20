@@ -35,7 +35,11 @@ model User {
   email     String   @unique
   name      String
   phone     String?
+  /// Scrypt hash of the account password. Null for users created as a booking
+  /// guest (by email only) who never set a password.
+  passwordHash String?
   rentals   Rental[]
+  loginCodes LoginCode[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -112,5 +116,24 @@ model VerificationCode {
 
   createdAt DateTime @default(now())
 
+  @@index([expiresAt])
+}
+
+/// One-time code emailed to a booking guest so they can open "My bookings"
+/// without ever setting a password.
+model LoginCode {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// SHA-256 hash of the code — the plain code is never stored.
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
   @@index([expiresAt])
 }
