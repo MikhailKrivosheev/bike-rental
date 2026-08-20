@@ -148,6 +148,8 @@
     "done": "Concluído",
     "perHourShort": "/ hora",
     "rangeHint": "Escolha uma segunda data para alugar ao dia.",
+    "rangeBlocked": "Esse intervalo inclui um dia em que esta bicicleta já está reservada. Escolha outro intervalo, ou reserve um único dia à volta da reserva existente.",
+    "checkoutHint": "Em reservas de vários dias, a devolução é até às {time} no último dia, como o checkout de um hotel — é assim que a tarifa diária se mantém justa.",
     "days": "{days, plural, one {# dia} other {# dias}}",
     "calculationDays": "{price} × {days, plural, one {# dia} other {# dias}}",
     "perDayShort": "/ dia",

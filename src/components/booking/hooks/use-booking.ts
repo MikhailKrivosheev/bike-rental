@@ -7,12 +7,15 @@ import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
 import {
+  CHECKOUT_TIME,
   DEFAULT_HOURS,
+  atTimeOfDay,
   clampHours,
   daysBetween,
-  hourOf,
   hoursBetween,
+  minutesOf,
   nextPickupTime,
+  pickupTimeAfterHours,
   pickupTimes,
   quoteRental,
 } from "Lib/rental";
@@ -40,16 +43,16 @@ type BookingState = {
   startsAt: Date | null;
 };
 
-function initialState(): BookingState {
+function initialState(userEmail: string | null = null): BookingState {
   const time = pickupTimes[2] ?? pickupTimes[0];
 
   return {
     step: "details",
     range: undefined,
     time,
-    endTime: pickupTimes[2 + DEFAULT_HOURS] ?? nextPickupTime(time),
+    endTime: pickupTimeAfterHours(time, DEFAULT_HOURS),
     accessories: [],
-    email: "",
+    email: userEmail ?? "",
     code: "",
     rentalId: null,
     startsAt: null,
@@ -57,7 +60,7 @@ function initialState(): BookingState {
 }
 
 type BookingAction =
-  | { type: "reset" }
+  | { type: "reset"; userEmail: string | null }
   | { type: "setStep"; step: BookingStep }
   | { type: "setRange"; range: DateRange | undefined }
   | { type: "setTime"; time: string }
@@ -73,19 +76,23 @@ type BookingAction =
 function bookingReducer(state: BookingState, action: BookingAction): BookingState {
   switch (action.type) {
     case "reset":
-      return initialState();
+      return initialState(action.userEmail);
     case "setStep":
       return { ...state, step: action.step };
-    case "setRange":
-      return { ...state, range: action.range };
+    case "setRange": {
+      const days =
+        action.range?.from && action.range.to ? daysBetween(action.range.from, action.range.to) : 0;
+      // Multi-day rentals return at a fixed checkout time — see CHECKOUT_TIME.
+      return { ...state, range: action.range, endTime: days > 0 ? CHECKOUT_TIME : state.endTime };
+    }
     case "setTime": {
       const time = action.time;
       // Keep the range non-empty when the start slides past the current end.
-      const endTime = hourOf(state.endTime) > hourOf(time) ? state.endTime : nextPickupTime(time);
+      const endTime = minutesOf(state.endTime) > minutesOf(time) ? state.endTime : nextPickupTime(time);
       return { ...state, time, endTime };
     }
     case "setEndTime":
-      return hourOf(action.endTime) > hourOf(state.time)
+      return minutesOf(action.endTime) > minutesOf(state.time)
         ? { ...state, endTime: action.endTime }
         : state;
     case "toggleAccessory":
@@ -115,7 +122,7 @@ export function useBooking(bike: BookingBike, userEmail: string | null = null) {
   const locale = useLocale();
   const router = useRouter();
 
-  const [state, dispatch] = useReducer(bookingReducer, undefined, initialState);
+  const [state, dispatch] = useReducer(bookingReducer, userEmail, initialState);
   const [isPending, startTransition] = useTransition();
   const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([]);
 
@@ -155,17 +162,14 @@ export function useBooking(bike: BookingBike, userEmail: string | null = null) {
     const day = range.from;
     const isToday = day.toDateString() === new Date().toDateString();
     const isTaken = (candidateTime: string) => {
-      const candidate = new Date(day);
-      candidate.setHours(hourOf(candidateTime), 0, 0, 0);
+      const candidate = atTimeOfDay(day, candidateTime);
       return bookedRanges.some((booked) => booked.start <= candidate && booked.end > candidate);
     };
     const isPast = (candidateTime: string) => {
       if (!isToday) {
         return false;
       }
-      const candidate = new Date(day);
-      candidate.setHours(hourOf(candidateTime), 0, 0, 0);
-      return candidate <= new Date();
+      return atTimeOfDay(day, candidateTime) <= new Date();
     };
 
     if (!isTaken(time) && !isPast(time)) {
@@ -290,7 +294,7 @@ export function useBooking(bike: BookingBike, userEmail: string | null = null) {
     if (step === "done") {
       router.refresh();
     }
-    dispatch({ type: "reset" });
+    dispatch({ type: "reset", userEmail });
   }
 
   return {

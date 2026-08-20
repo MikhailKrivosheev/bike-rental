@@ -156,6 +156,8 @@
     "done": "Done",
     "perHourShort": "/ hour",
     "rangeHint": "Pick a second date to rent by the day.",
+    "rangeBlocked": "That range includes a day this bike is already booked. Pick a different range, or book a single day around the existing booking.",
+    "checkoutHint": "Multi-day rentals return by {time} on the last day, like a hotel checkout — that's what keeps the day rate fair.",
     "days": "{days, plural, one {# day} other {# days}}",
     "calculationDays": "{price} × {days, plural, one {# day} other {# days}}",
     "perDayShort": "/ day",

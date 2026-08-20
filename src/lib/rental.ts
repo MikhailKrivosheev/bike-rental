@@ -26,32 +26,70 @@ export const DEFAULT_HOURS = 3;
 /** Rentals may run for at most a fortnight. */
 export const MAX_DAYS = 14;
 
-/** Opening hours of the stations — pickup times are offered within this range. */
-export const OPENS_AT = 8;
-export const CLOSES_AT = 23;
+/** The stations close for lunch, so opening hours are two separate windows. */
+export type BusinessWindow = { start: string; end: string };
 
-export const pickupTimes = Array.from(
-  { length: CLOSES_AT - OPENS_AT },
-  (_, index) => `${String(OPENS_AT + index).padStart(2, '0')}:00`,
-);
+export const BUSINESS_HOURS: readonly BusinessWindow[] = [
+  { start: '09:00', end: '13:00' },
+  { start: '14:30', end: '19:30' },
+];
 
-export function clampHours(hours: number) {
-  return Math.min(MAX_HOURS, Math.max(MIN_HOURS, Math.round(hours)));
+/** `"14:30"` → `870`. Lets times be compared and stepped without hard-coding `HH:00`. */
+export function minutesOf(time: string) {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
 }
 
-/** `"14:00"` → `14`. Pickup times are always `HH:00`, so this is safe. */
-export function hourOf(time: string) {
-  return Number(time.slice(0, 2));
+function formatMinutes(totalMinutes: number) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+/** Every hour-wide pickup/return slot across both opening windows, in order. */
+export const pickupTimes = BUSINESS_HOURS.flatMap((window) => {
+  const slots: string[] = [];
+  for (let minute = minutesOf(window.start); minute < minutesOf(window.end); minute += 60) {
+    slots.push(formatMinutes(minute));
+  }
+  return slots;
+});
+
+/**
+ * The fixed return time for multi-day rentals — like a hotel checkout. Without
+ * it, a range booked 09:00 on day one to 19:30 on the last day would use the
+ * bike for nearly a full extra day while only being billed per calendar day.
+ */
+export const CHECKOUT_TIME = pickupTimes[0];
+
+// Pickup/return slots fall on the hour or the half-hour, so hours are never
+// rounded here — rounding up would bill for time the renter didn't take.
+export function clampHours(hours: number) {
+  return Math.min(MAX_HOURS, Math.max(MIN_HOURS, hours));
 }
 
 export function hoursBetween(startTime: string, endTime: string) {
-  return hourOf(endTime) - hourOf(startTime);
+  return (minutesOf(endTime) - minutesOf(startTime)) / 60;
 }
 
 /** The next pickup slot after `time`, or the last one if `time` is already the last. */
 export function nextPickupTime(time: string) {
   const index = pickupTimes.indexOf(time);
   return pickupTimes[Math.min(index + 1, pickupTimes.length - 1)] ?? time;
+}
+
+/** The next slot at least `hours` after `time`, clamped to the last slot of the day. */
+export function pickupTimeAfterHours(time: string, hours: number) {
+  const target = minutesOf(time) + hours * 60;
+  return pickupTimes.find((candidate) => minutesOf(candidate) >= target) ?? pickupTimes[pickupTimes.length - 1];
+}
+
+/** `time` ("HH:MM") applied to `date`'s year/month/day, in the local timezone. */
+export function atTimeOfDay(date: Date, time: string) {
+  const [hours, minutes] = time.split(':').map(Number);
+  const result = new Date(date);
+  result.setHours(hours, minutes, 0, 0);
+  return result;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -99,6 +137,8 @@ export function quoteRental(
     units,
     unitPrice,
     accessories: addOns,
-    total: unitPrice * units + addOns,
+    // units can be a half hour, so round to the nearest cent rather than
+    // letting a fractional-cent price leak into the total.
+    total: Math.round(unitPrice * units) + addOns,
   };
 }

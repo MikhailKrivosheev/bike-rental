@@ -4,6 +4,8 @@ import { RiCalendarLine } from '@remixicon/react';
 import { enUS } from 'date-fns/locale';
 import { useFormatter, useLocale } from 'next-intl';
 import { useMemo, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
+import { toast } from 'sonner';
 
 import { dateFnsLocales } from 'Components/booking/constants';
 import type { FieldsProps } from 'Components/booking/types';
@@ -19,13 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'Components/ui/select';
-import { CLOSES_AT, MAX_DAYS, OPENS_AT, accessories, pickupTimes } from 'Lib/rental';
-
-function atLocalHour(day: Date, time: string) {
-  const result = new Date(day);
-  result.setHours(Number(time.slice(0, 2)), 0, 0, 0);
-  return result;
-}
+import { CHECKOUT_TIME, MAX_DAYS, accessories, atTimeOfDay, pickupTimes } from 'Lib/rental';
 
 export function Fields({ booking, bike }: FieldsProps) {
   const { translate } = booking;
@@ -47,32 +43,53 @@ export function Fields({ booking, bike }: FieldsProps) {
       : format.dateTime(from, { dateStyle: 'long' })
     : translate('pickDate');
 
-  /** True once every hourly slot from opening to closing on `day` falls inside a booked window. */
+  /** True once every hour-wide opening slot on `day` falls inside a booked window. */
   function isFullyBooked(day: Date) {
-    for (let hour = OPENS_AT; hour < CLOSES_AT; hour += 1) {
-      const slotStart = new Date(day);
-      slotStart.setHours(hour, 0, 0, 0);
-      const slotEnd = new Date(day);
-      slotEnd.setHours(hour + 1, 0, 0, 0);
-
-      const covered = booking.bookedRanges.some(
-        (range) => range.start <= slotStart && range.end >= slotEnd,
-      );
-
-      if (!covered) {
-        return false;
-      }
-    }
-    return true;
+    return pickupTimes.every((slot) => {
+      const slotStart = atTimeOfDay(day, slot);
+      const slotEnd = new Date(slotStart.getTime() + 60 * 60 * 1000);
+      return booking.bookedRanges.some((range) => range.start <= slotStart && range.end >= slotEnd);
+    });
   }
 
   function isPartiallyBooked(day: Date) {
-    const dayStart = new Date(day);
-    dayStart.setHours(OPENS_AT, 0, 0, 0);
-    const dayEnd = new Date(day);
-    dayEnd.setHours(CLOSES_AT, 0, 0, 0);
+    return pickupTimes.some((slot) => {
+      const slotStart = atTimeOfDay(day, slot);
+      const slotEnd = new Date(slotStart.getTime() + 60 * 60 * 1000);
+      return booking.bookedRanges.some((range) => range.start < slotEnd && range.end > slotStart);
+    });
+  }
 
-    return booking.bookedRanges.some((range) => range.start < dayEnd && range.end > dayStart);
+  /**
+   * For a multi-day range, every day strictly between the pickup and return
+   * day belongs to the renter in full — so any existing booking there (even
+   * a partial one) makes the whole range unbookable, regardless of which
+   * pickup/return hours get picked afterwards.
+   */
+  function hasInteriorConflict(range: DateRange) {
+    if (!range.from || !range.to) {
+      return false;
+    }
+
+    const cursor = new Date(range.from);
+    cursor.setDate(cursor.getDate() + 1);
+
+    while (cursor < range.to) {
+      if (isPartiallyBooked(cursor)) {
+        return true;
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return false;
+  }
+
+  function handleRangeSelect(range: DateRange | undefined) {
+    if (range?.from && range.to && range.from.getTime() !== range.to.getTime() && hasInteriorConflict(range)) {
+      toast.error(translate('rangeBlocked'));
+      return;
+    }
+    booking.setRange(range);
   }
 
   /** Whether the given pickup instant on the current start day has already passed. */
@@ -80,7 +97,7 @@ export function Fields({ booking, bike }: FieldsProps) {
     if (!from || from.getTime() !== today.getTime()) {
       return false;
     }
-    return atLocalHour(from, time) <= new Date();
+    return atTimeOfDay(from, time) <= new Date();
   }
 
   /** Whether the given pickup instant on the current start day already belongs to a booked rental. */
@@ -88,7 +105,7 @@ export function Fields({ booking, bike }: FieldsProps) {
     if (!from) {
       return false;
     }
-    const candidate = atLocalHour(from, time);
+    const candidate = atTimeOfDay(from, time);
     return booking.bookedRanges.some((range) => range.start <= candidate && range.end > candidate);
   }
 
@@ -97,8 +114,8 @@ export function Fields({ booking, bike }: FieldsProps) {
     if (!from) {
       return false;
     }
-    const rangeStart = atLocalHour(from, booking.time);
-    const rangeEnd = atLocalHour(to ?? from, endTime);
+    const rangeStart = atTimeOfDay(from, booking.time);
+    const rangeEnd = atTimeOfDay(to ?? from, endTime);
     return booking.bookedRanges.some((range) => range.start < rangeEnd && range.end > rangeStart);
   }
 
@@ -117,7 +134,7 @@ export function Fields({ booking, bike }: FieldsProps) {
             <Calendar
               mode="range"
               selected={booking.range}
-              onSelect={booking.setRange}
+              onSelect={handleRangeSelect}
               disabled={[{ before: today }, isFullyBooked]}
               modifiers={{ partiallyBooked: isPartiallyBooked }}
               modifiersClassNames={{ partiallyBooked: 'after:absolute after:bottom-1 after:size-1 after:rounded-full after:bg-destructive' }}
@@ -152,31 +169,46 @@ export function Fields({ booking, bike }: FieldsProps) {
                 <SelectItem
                   key={value}
                   value={value}
-                  disabled={(booking.days === 0 && isTimeTaken(value)) || isTimePast(value)}
+                  disabled={isTimeTaken(value) || isTimePast(value)}
                 >
                   {value}
-                  {booking.days === 0 && isTimeTaken(value) ? ` — ${translate('slotTaken')}` : ''}
+                  {isTimeTaken(value) ? ` — ${translate('slotTaken')}` : ''}
                   {isTimePast(value) ? ` — ${translate('slotPast')}` : ''}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Select value={booking.endTime} onValueChange={booking.setEndTime}>
-            <SelectTrigger aria-label={translate('endTime')} className="!h-[38px] w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {pickupTimes
-                .filter((value) => booking.days > 0 || value > booking.time)
-                .map((value) => (
-                  <SelectItem key={value} value={value} disabled={isEndTimeBlocked(value)}>
-                    {value}
-                    {isEndTimeBlocked(value) ? ` — ${translate('slotTaken')}` : ''}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
+          {booking.days > 0 ? (
+            <div
+              aria-label={translate('endTime')}
+              className="flex h-[38px] items-center justify-between rounded-lg border bg-muted/40 px-3 text-sm"
+            >
+              <span className="text-muted-foreground">{translate('endTime')}</span>
+              <span className="tabular-nums">{booking.endTime}</span>
+            </div>
+          ) : (
+            <Select value={booking.endTime} onValueChange={booking.setEndTime}>
+              <SelectTrigger aria-label={translate('endTime')} className="!h-[38px] w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {pickupTimes
+                  .filter((value) => value > booking.time)
+                  .map((value) => (
+                    <SelectItem key={value} value={value} disabled={isEndTimeBlocked(value)}>
+                      {value}
+                      {isEndTimeBlocked(value) ? ` — ${translate('slotTaken')}` : ''}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
+        {booking.days > 0 ? (
+          <p className="text-xs text-muted-foreground">
+            {translate('checkoutHint', { time: CHECKOUT_TIME })}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2">
