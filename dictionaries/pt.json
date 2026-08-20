@@ -4,8 +4,8 @@
     "description": "Alugue uma bicicleta à hora"
   },
   "Header": {
-    "brand": "Velo",
-    "brandInitial": "V",
+    "brand": "Bike Nomad",
+    "brandInitial": "BN",
     "catalogue": "Catálogo",
     "howItWorks": "Como funciona",
     "pickupPoints": "Pontos de levantamento",
