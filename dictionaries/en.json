@@ -161,7 +161,9 @@
     "days": "{days, plural, one {# day} other {# days}}",
     "calculationDays": "{price} × {days, plural, one {# day} other {# days}}",
     "perDayShort": "/ day",
-    "summaryEnd": "Return"
+    "summaryEnd": "Return",
+    "summaryAccessories": "Add-ons",
+    "summaryNoAccessories": "None"
   },
   "Hero": {
     "available": "{count, plural, =0 {No bikes available right now} one {# bike available right now} other {# bikes available right now}}",

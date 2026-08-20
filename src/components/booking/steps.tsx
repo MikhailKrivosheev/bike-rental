@@ -115,6 +115,12 @@ export function Steps({ booking, bike, onCancel }: StepsProps) {
     const rows = [
       { label: translate('summaryBike'), value: bike.model },
       {
+        label: translate('summaryAccessories'),
+        value: booking.accessories.length
+          ? booking.accessories.map((id) => translate(`accessory.${id}`)).join(', ')
+          : translate('summaryNoAccessories'),
+      },
+      {
         label: translate('summaryStart'),
         value: format.dateTime(booking.startsAt, { dateStyle: 'medium', timeStyle: 'short' }),
       },
