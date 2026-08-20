@@ -94,7 +94,7 @@ export default async function Home() {
             width={340}
             height={480}
             priority
-            className="pointer-events-none absolute left-[100%] top-0 z-0 hidden h-auto w-auto object-contain object-bottom select-none md:block lg:right-8 -translate-x-1/2 -translate-y-1/4"
+            className="pointer-events-none absolute left-[85%] -top-1/2 z-0 hidden h-auto w-auto object-contain object-bottom select-none md:block"
           />
         </div>
       </Section>
